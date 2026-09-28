@@ -107,8 +107,6 @@ repository-root/
 └── README.md
 ```
 
-The standalone Tanvi and Sanika prototypes and Ishita's standalone frontend/backend code are excluded from the distribution. The two Pallavi modules and Ishita evidence assets remain because the integrated adapters still import or read them directly. Empty output/upload folders are retained with `.gitkeep`; generated content and uploaded documents are ignored by Git.
-
 ## Troubleshooting
 
 - **Ollama connection or missing-model error:** Start Ollama with `ollama serve`, confirm it is reachable locally, and run `ollama list`. Pull `qwen2.5:3b`; if you do not set `OLLAMA_MODEL=qwen2.5:3b`, also pull `qwen2.5:1.5b` for the social adapter.
