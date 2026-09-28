@@ -1,0 +1,31 @@
+# Web Framework & Interface
+streamlit==1.38.0
+fastapi==0.112.0
+uvicorn==0.30.5
+python-multipart==0.0.9
+
+# Data Modeling & AI Runtime
+pydantic==2.8.2
+ollama==0.3.1
+SQLAlchemy>=2.0,<3.0
+pydantic-settings>=2.0,<3.0
+
+# Document Parsing & Processing
+pdfplumber==0.11.4
+python-docx==1.1.2
+pypdf>=5.0,<7.0
+
+# Document & Content Generation
+python-pptx==0.6.23
+weasyprint==62.3
+jinja2==3.1.4
+
+# Image, video and offline narration rendering
+moviepy>=2.0,<3.0
+Pillow>=10,<12
+numpy>=1.26,<3
+pyttsx3
+
+# Security & Utilities
+loguru==0.7.2
+requests==2.32.3

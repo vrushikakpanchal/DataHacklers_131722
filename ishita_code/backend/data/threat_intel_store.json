@@ -1,0 +1,30 @@
+[
+  {
+    "id": "cisa-CVE-2023-38606",
+    "source_name": "CISA-KEV",
+    "cve_id": "CVE-2023-38606",
+    "title": "Apple Multiple Products Memory Corruption Vulnerability",
+    "summary": "A vulnerability in the kernel allows malicious apps to modify sensitive kernel state.",
+    "technical_details": "Vendor: Apple, Product: iOS and macOS. Known exploited in the wild.",
+    "mitigations": [
+      "Apply vendor updates per advisory."
+    ],
+    "affected_products": [
+      "Apple iOS and macOS"
+    ],
+    "cvss_score": null,
+    "severity": null,
+    "references": [
+      "https://support.apple.com/en-us/HT213841"
+    ],
+    "raw_metadata": {
+      "cveID": "CVE-2023-38606",
+      "vendorProject": "Apple",
+      "product": "iOS and macOS",
+      "vulnerabilityName": "Apple Multiple Products Memory Corruption Vulnerability",
+      "shortDescription": "A vulnerability in the kernel allows malicious apps to modify sensitive kernel state.",
+      "requiredAction": "Apply vendor updates per advisory.",
+      "notes": "https://support.apple.com/en-us/HT213841"
+    }
+  }
+]

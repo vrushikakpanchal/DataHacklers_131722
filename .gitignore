@@ -1,0 +1,66 @@
+# Python environments and caches
+/venv/
+/.venv/
+**/venv/
+**/.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local secrets and editor / OS files
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Uploaded files are temporary runtime data; keep the empty folder marker.
+/temp_uploads/*
+!/temp_uploads/.gitkeep
+/my_code/temp_uploads/*
+!/my_code/temp_uploads/.gitkeep
+
+# Generated output artifacts; retain only directory placeholders.
+/data/outputs/**
+!/data/outputs/.gitkeep
+/output/**
+!/output/.gitkeep
+/video_scenes/**
+!/video_scenes/.gitkeep
+/my_code/data/outputs/**
+!/my_code/data/outputs/.gitkeep
+/my_code/output/**
+!/my_code/output/.gitkeep
+
+# Standalone team prototypes are not part of the Streamlit distribution.
+/tanvi_code/
+/sanika_code/
+
+# The social adapter imports these two files directly; keep them available.
+/pallavi_code/*
+!/pallavi_code/generator.py
+!/pallavi_code/validator.py
+
+# Ishita's frontend/backend prototype is excluded, but the integrated local
+# threat-intel adapter reads this sample store and these bundled evidence files.
+/ishita_code/*
+!/ishita_code/backend/
+!/ishita_code/datasets/
+/ishita_code/backend/*
+!/ishita_code/backend/data/
+/ishita_code/backend/data/*
+!/ishita_code/backend/data/threat_intel_store.json
+/ishita_code/datasets/*
+!/ishita_code/datasets/*.pdf
+!/ishita_code/datasets/*known_exploited*.csv
+
+# Streamlit local state
+.streamlit/secrets.toml
