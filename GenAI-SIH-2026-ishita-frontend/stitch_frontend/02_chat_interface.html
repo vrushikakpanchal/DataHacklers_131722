@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="web_dashboard" name="shell-type"/>
+  <title>SecuScribe | Multi-Format Deliverables Engine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-secondary-fixed-variant": "#444460",
+            "outline-variant": "#c9c5cb",
+            "tertiary": "#000000",
+            "on-error": "#ffffff",
+            "surface-variant": "#e2e2e4",
+            "surface-container-low": "#f3f3f5",
+            "on-primary": "#ffffff",
+            "secondary-container": "#deddff",
+            "on-surface": "#1a1c1d",
+            "secondary": "#5b5c79",
+            "primary-fixed": "#e5e1e8",
+            "background": "#f9f9fb",
+            "on-secondary": "#ffffff",
+            "on-primary-fixed": "#1c1b20",
+            "inverse-surface": "#2f3132",
+            "on-tertiary-fixed": "#161f00",
+            "surface-bright": "#f9f9fb",
+            "on-background": "#1a1c1d",
+            "on-error-container": "#93000a",
+            "on-primary-fixed-variant": "#48464c",
+            "secondary-fixed": "#e1e0ff",
+            "inverse-primary": "#c9c5cc",
+            "surface-container-lowest": "#ffffff",
+            "error": "#ba1a1a",
+            "surface-container-high": "#e8e8ea",
+            "on-surface-variant": "#48464b",
+            "tertiary-container": "#161f00",
+            "primary-fixed-dim": "#c9c5cc",
+            "on-primary-container": "#858389",
+            "secondary-fixed-dim": "#c4c4e5",
+            "error-container": "#ffdad6",
+            "inverse-on-surface": "#f0f0f2",
+            "surface-container": "#eeeef0",
+            "on-tertiary-container": "#708f00",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed": "#181932",
+            "primary": "#000000",
+            "outline": "#79767b",
+            "tertiary-fixed": "#c8f250",
+            "primary-container": "#1c1b20",
+            "tertiary-fixed-dim": "#add534",
+            "surface-tint": "#605d63",
+            "on-secondary-container": "#60607d",
+            "surface": "#f9f9fb",
+            "surface-dim": "#d9dadc",
+            "on-tertiary-fixed-variant": "#3b4d00",
+            "surface-container-highest": "#e2e2e4"
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px"
+          },
+          spacing: {
+            "margin-sm": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2.5rem",
+            "space-lg": "1.5rem",
+            margin: "2rem",
+            "gutter-sm": "1rem",
+            "space-md": "1rem",
+            gutter: "1.5rem",
+            "space-xs": "0.25rem"
+          },
+          fontFamily: {
+            "label-md": ["Plus Jakarta Sans"],
+            "title-md": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Inter"],
+            "headline-xl-mobile": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"]
+          },
+          fontSize: {
+            "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.03em", fontWeight: "700" }],
+            "title-md": ["16px", { lineHeight: "24px", letterSpacing: "-0.005em", fontWeight: "600" }],
+            "body-md": ["14px", { lineHeight: "22px", letterSpacing: "0em", fontWeight: "400" }],
+            "headline-lg": ["36px", { lineHeight: "44px", letterSpacing: "-0.025em", fontWeight: "700" }],
+            "body-sm": ["12px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "400" }],
+            "headline-xl-mobile": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "headline-md": ["24px", { lineHeight: "32px", letterSpacing: "-0.015em", fontWeight: "700" }],
+            "headline-lg-mobile": ["26px", { lineHeight: "34px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "headline-xl": ["48px", { lineHeight: "56px", letterSpacing: "-0.03em", fontWeight: "800" }],
+            "body-lg": ["16px", { lineHeight: "26px", letterSpacing: "0em", fontWeight: "400" }],
+            "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.02em", fontWeight: "700" }],
+            "label-sm": ["10px", { lineHeight: "14px", letterSpacing: "0.05em", fontWeight: "800" }],
+            "headline-sm": ["20px", { lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "600" }]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface-container-lowest font-body-md text-on-surface antialiased">
+  <!-- SIDEBAR -->
+  <aside class="fixed left-0 top-0 h-full w-[280px] bg-surface-container-lowest border-r-[1.5px] border-primary z-50 flex flex-col justify-between p-space-md">
+    <div class="flex flex-col gap-space-lg">
+      <div class="flex items-center justify-between">
+        <a class="flex items-center gap-space-xs text-on-surface hover:text-on-surface-variant transition-colors px-2.5 py-1 rounded-full border border-primary/20 hover:border-primary" href="01_homepage.html">
+          <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface font-bold">Back to Home</span>
+        </a>
+        <span class="font-title-md text-title-md tracking-tight text-primary font-extrabold">SECUSCRIBE</span>
+      </div>
+      <a class="w-full flex items-center justify-center gap-space-xs bg-primary text-on-primary border-[1.5px] border-primary rounded-full py-space-sm px-space-md font-label-md text-label-md transition-all shadow-[3px_3px_0px_#1c1b20] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[5px_5px_0px_#1c1b20] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none" href="02_chat_interface.html">
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        <span>New Transformation</span>
+      </a>
+      <div class="flex flex-col gap-space-sm">
+        <div class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant px-space-xs font-extrabold">SAVED PROJECTS</div>
+        <nav class="flex flex-col gap-space-xs" id="savedProjectsNav">
+          <a class="flex items-center gap-space-sm px-3 py-2 rounded-xl bg-secondary-container border-[1.5px] border-primary text-on-surface font-label-md text-label-md shadow-[2px_2px_0px_#1c1b20] transition-all cursor-pointer" onclick="loadSampleProject('SCADA Security Briefing')">
+            <span class="material-symbols-outlined text-[18px]">folder</span>
+            <span class="truncate">SCADA Security Briefing</span>
+          </a>
+          <a class="flex items-center gap-space-sm px-3 py-2 rounded-xl border-[1.5px] border-transparent text-on-surface-variant font-label-md text-label-md transition-all hover:bg-surface-container-low hover:text-on-surface cursor-pointer" onclick="loadSampleProject('Q3 Strategic Report')">
+            <span class="material-symbols-outlined text-[18px]">description</span>
+            <span class="truncate">Q3 Strategic Report</span>
+          </a>
+          <a class="flex items-center gap-space-sm px-3 py-2 rounded-xl border-[1.5px] border-transparent text-on-surface-variant font-label-md text-label-md transition-all hover:bg-surface-container-low hover:text-on-surface cursor-pointer" onclick="loadSampleProject('Market Expansion Deck')">
+            <span class="material-symbols-outlined text-[18px]">slideshow</span>
+            <span class="truncate">Market Expansion Deck</span>
+          </a>
+          <a class="flex items-center gap-space-sm px-3 py-2 rounded-xl border-[1.5px] border-transparent text-on-surface-variant font-label-md text-label-md transition-all hover:bg-surface-container-low hover:text-on-surface cursor-pointer" onclick="loadSampleProject('Product Launch Summary')">
+            <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
+            <span class="truncate">Product Launch Summary</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+    <div class="pt-space-md border-t-[1.5px] border-primary">
+      <div class="flex items-center justify-between p-space-sm rounded-xl bg-surface-container-low border-[1.5px] border-primary">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="font-label-md text-label-md truncate text-on-surface font-bold">Operator 01</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant truncate">Security Officer</span>
+          </div>
+        </div>
+        <button aria-label="Settings" class="text-on-surface hover:text-on-surface-variant transition-colors p-space-xs">
+          <span class="material-symbols-outlined text-[20px]">settings</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="pl-[280px]">
+    <!-- HEADER -->
+    <header class="fixed top-0 left-[280px] right-0 h-16 bg-surface-container-lowest border-b-[1.5px] border-primary z-40 px-space-lg flex items-center justify-between">
+      <div class="flex items-center gap-space-sm">
+        <span class="material-symbols-outlined text-on-surface-variant text-[20px]">edit_document</span>
+        <span class="font-headline-sm text-headline-sm text-on-surface font-bold" id="transformationTitle">Untitled Transformation</span>
+      </div>
+      <div class="flex items-center gap-space-md">
+        <div class="inline-flex items-center gap-space-xs bg-tertiary-fixed text-on-tertiary-fixed border-[1.5px] border-primary rounded-full px-space-md py-space-xs font-label-sm text-label-sm uppercase shadow-[2px_2px_0px_#1c1b20]">
+          <span class="inline-block w-2 h-2 rounded-full bg-on-tertiary-fixed animate-pulse"></span>
+          <span>System Ready</span>
+        </div>
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center border-[1.5px] border-primary">
+          <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT WORKSPACE -->
+    <main class="relative pt-16 min-h-screen bg-surface-container-lowest w-full px-space-lg">
+      <div class="flex flex-col w-full">
+        <div class="w-full max-w-4xl mx-auto flex flex-col items-center justify-between pb-10">
+          <!-- HERO PROMPT -->
+          <div class="text-center pt-6 pb-6 flex flex-col items-center">
+            <div class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-secondary-container text-on-surface border-[1.5px] border-primary mb-space-sm shadow-[2px_2px_0px_#1c1b20]">
+              <span class="material-symbols-outlined text-[16px] text-primary">auto_fix_high</span>
+              <span class="font-label-sm text-label-sm uppercase tracking-wider font-extrabold">Multi-Format Deliverables Engine</span>
+            </div>
+            <h1 class="font-headline-xl text-headline-xl text-primary tracking-tight mb-space-xs font-extrabold">How can I help you today?</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl text-center">Select the deliverable formats you need, attach your file, and start typing.</p>
+          </div>
+
+          <!-- 6 DELIVERABLE CARDS GRID -->
+          <div class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <!-- Card 1: Social Media -->
+            <div class="deliverable-card group relative bg-surface-container-lowest border-[1.5px] border-primary rounded-xl p-space-md transition-all duration-150 cursor-pointer shadow-[3px_3px_0px_#1c1b20] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#1c1b20]" data-format="social" onclick="toggleCard(this)">
+              <div class="flex items-start justify-between mb-space-sm">
+                <div class="w-10 h-10 rounded-lg bg-surface-container-low border-[1.5px] border-primary flex items-center justify-center text-primary group-hover:bg-secondary-container transition-colors">
+                  <span class="material-symbols-outlined text-[22px]">tag</span>
+                </div>
+                <div class="checkbox-box w-5 h-5 rounded border-[1.5px] border-primary bg-tertiary-fixed flex items-center justify-center shadow-[1.5px_1.5px_0px_#1c1b20] transition-colors">
+                  <span class="material-symbols-outlined text-primary text-[15px] font-bold select-none check-icon">check</span>
+                </div>
+              </div>
+              <div class="font-title-md text-title-md text-primary mb-1 font-bold">Social Media Briefs</div>
+              <div class="font-body-sm text-body-sm text-on-surface-variant mb-space-md min-h-[36px]">Publication-ready posts for LinkedIn &amp; Twitter/X</div>
+              <div class="flex items-center">
+                <span class="inline-flex items-center gap-1 font-label-sm text-label-sm px-2.5 py-0.5 rounded-full bg-surface-container-low border-[1.5px] border-primary text-on-surface font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>LinkedIn + X
+                </span>
+              </div>
+            </div>
+
+            <!-- Card 2: Narrated Video -->
+            <div class="deliverable-card group relative bg-surface-container-lowest border-[1.5px] border-primary rounded-xl p-space-md transition-all duration-150 cursor-pointer shadow-[3px_3px_0px_#1c1b20] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#1c1b20]" data-format="video" onclick="toggleCard(this)">
+              <div class="flex items-start justify-between mb-space-sm">
+                <div class="w-10 h-10 rounded-lg bg-surface-container-low border-[1.5px] border-primary flex items-center justify-center text-primary group-hover:bg-secondary-container transition-colors">
+                  <span class="material-symbols-outlined text-[22px]">slideshow</span>
+                </div>
+                <div class="checkbox-box w-5 h-5 rounded border-[1.5px] border-primary bg-tertiary-fixed flex items-center justify-center shadow-[1.5px_1.5px_0px_#1c1b20] transition-colors">
+                  <span class="material-symbols-outlined text-primary text-[15px] font-bold select-none check-icon">check</span>
+                </div>
+              </div>
+              <div class="font-title-md text-title-md text-primary mb-1 font-bold">Narrated Video</div>
+              <div class="font-body-sm text-body-sm text-on-surface-variant mb-space-md min-h-[36px]">Storyboards, narration scripts, and video preview</div>
+              <div class="flex items-center">
+                <span class="inline-flex items-center gap-1 font-label-sm text-label-sm px-2.5 py-0.5 rounded-full bg-surface-container-low border-[1.5px] border-primary text-on-surface font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>HD Preview + Voice
+                </span>
+              </div>
+            </div>
+
+            <!-- Card 3: Official Advisory -->
+            <div class="deliverable-card group relative bg-surface-container-lowest border-[1.5px] border-primary rounded-xl p-space-md transition-all duration-150 cursor-pointer shadow-[3px_3px_0px_#1c1b20] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#1c1b20]" data-format="advisory" onclick="toggleCard(this)">
+              <div class="flex items-start justify-between mb-space-sm">
+                <div class="w-10 h-10 rounded-lg bg-surface-container-low border-[1.5px] border-primary flex items-center justify-center text-primary group-hover:bg-secondary-container transition-colors">
+                  <span class="material-symbols-outlined text-[22px]">policy</span>
+                </div>
+                <div class="checkbox-box w-5 h-5 rounded border-[1.5px] border-primary bg-tertiary-fixed flex items-center justify-center shadow-[1.5px_1.5px_0px_#1c1b20] transition-colors">
+                  <span class="material-symbols-outlined text-primary text-[15px] font-bold select-none check-icon">check</span>
+                </div>
+              </div>
+              <div class="font-title-md text-title-md text-primary mb-1 font-bold">Official Advisory</div>
+              <div class="font-body-sm text-body-sm text-on-surface-variant mb-space-md min-h-[36px]">Structured, formal advisory documents</div>
+              <div class="flex items-center">
+                <span class="inline-flex items-center gap-1 font-label-sm text-label-sm px-2.5 py-0.5 rounded-full bg-surface-container-low border-[1.5px] border-primary text-on-surface font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Formal PDF
+                </span>
+              </div>
+            </div>
+
+            <!-- Card 4: Executive Summary -->
+            <div class="deliverable-card group relative bg-surface-container-lowest border-[1.5px] border-primary rounded-xl p-space-md transition-all duration-150 cursor-pointer shadow-[3px_3px_0px_#1c1b20] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#1c1b20]" data-format="summary" onclick="toggleCard(this)">
+              <div class="flex items-start justify-between mb-space-sm">
+                <div class="w-10 h-10 rounded-lg bg-surface-container-low border-[1.5px] border-primary flex items-center justify-center text-primary group-hover:bg-secondary-container transition-colors">
+                  <span class="material-symbols-outlined text-[22px]">summarize</span>
+                </div>
+                <div class="checkbox-box w-5 h-5 rounded border-[1.5px] border-primary bg-tertiary-fixed flex items-center justify-center shadow-[1.5px_1.5px_0px_#1c1b20] transition-colors">
+                  <span class="material-symbols-outlined text-primary text-[15px] font-bold select-none check-icon">check</span>
+                </div>
+              </div>
+              <div class="font-title-md text-title-md text-primary mb-1 font-bold">Executive Summary</div>
+              <div class="font-body-sm text-body-sm text-on-surface-variant mb-space-md min-h-[36px]">High-level briefing for quick decision-making</div>
+              <div class="flex items-center">
+                <span class="inline-flex items-center gap-1 font-label-sm text-label-sm px-2.5 py-0.5 rounded-full bg-surface-container-low border-[1.5px] border-primary text-on-surface font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>1-Page Condensed
+                </span>
+              </div>
+            </div>
+
+            <!-- Card 5: Presentation Deck -->
+            <div class="deliverable-card group relative bg-surface-container-lowest border-[1.5px] border-primary rounded-xl p-space-md transition-all duration-150 cursor-pointer shadow-[3px_3px_0px_#1c1b20] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#1c1b20]" data-format="presentation" onclick="toggleCard(this)">
+              <div class="flex items-start justify-between mb-space-sm">
+                <div class="w-10 h-10 rounded-lg bg-surface-container-low border-[1.5px] border-primary flex items-center justify-center text-primary group-hover:bg-secondary-container transition-colors">
+                  <span class="material-symbols-outlined text-[22px]">co_present</span>
+                </div>
+                <div class="checkbox-box w-5 h-5 rounded border-[1.5px] border-primary bg-tertiary-fixed flex items-center justify-center shadow-[1.5px_1.5px_0px_#1c1b20] transition-colors">
+                  <span class="material-symbols-outlined text-primary text-[15px] font-bold select-none check-icon">check</span>
+                </div>
+              </div>
+              <div class="font-title-md text-title-md text-primary mb-1 font-bold">Presentation Deck</div>
+              <div class="font-body-sm text-body-sm text-on-surface-variant mb-space-md min-h-[36px]">Slide outlines, slide cards, and speaker notes</div>
+              <div class="flex items-center">
+                <span class="inline-flex items-center gap-1 font-label-sm text-label-sm px-2.5 py-0.5 rounded-full bg-surface-container-low border-[1.5px] border-primary text-on-surface font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>10-Slide Deck
+                </span>
+              </div>
+            </div>
+
+            <!-- Card 6: Dynamic Infographics -->
+            <div class="deliverable-card group relative bg-surface-container-lowest border-[1.5px] border-primary rounded-xl p-space-md transition-all duration-150 cursor-pointer shadow-[3px_3px_0px_#1c1b20] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#1c1b20]" data-format="infographic" onclick="toggleCard(this)">
+              <div class="flex items-start justify-between mb-space-sm">
+                <div class="w-10 h-10 rounded-lg bg-surface-container-low border-[1.5px] border-primary flex items-center justify-center text-primary group-hover:bg-secondary-container transition-colors">
+                  <span class="material-symbols-outlined text-[22px]">schema</span>
+                </div>
+                <div class="checkbox-box w-5 h-5 rounded border-[1.5px] border-primary bg-tertiary-fixed flex items-center justify-center shadow-[1.5px_1.5px_0px_#1c1b20] transition-colors">
+                  <span class="material-symbols-outlined text-primary text-[15px] font-bold select-none check-icon">check</span>
+                </div>
+              </div>
+              <div class="font-title-md text-title-md text-primary mb-1 font-bold">Dynamic Infographics</div>
+              <div class="font-body-sm text-body-sm text-on-surface-variant mb-space-md min-h-[36px]">Visual summaries and key message flowcharts</div>
+              <div class="flex items-center">
+                <span class="inline-flex items-center gap-1 font-label-sm text-label-sm px-2.5 py-0.5 rounded-full bg-surface-container-low border-[1.5px] border-primary text-on-surface font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Vector Flowchart
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE PARAMETER CONTROLS & CHAT INPUT CARD -->
+          <div class="w-full bg-surface-container-lowest border-[1.5px] border-primary rounded-xl p-space-md shadow-[4px_4px_0px_#1c1b20] transition-all">
+            <!-- DROPDOWNS BAR -->
+            <div class="flex items-center gap-2 overflow-x-visible pb-space-sm mb-space-sm border-b-[1.5px] border-surface-container-high relative">
+              <!-- Dropdown 1: Target Audience -->
+              <div class="relative inline-block text-left" id="ddAudienceContainer">
+                <button id="ddAudienceBtn" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-container-lowest border-[1.5px] border-primary text-on-surface font-label-sm text-label-sm transition-all hover:bg-surface-container-low hover:shadow-[2px_2px_0px_#1c1b20]" onclick="toggleDropdown('ddAudienceMenu', event)" type="button">
+                  <span id="ddAudienceText">Audience: Leadership &amp; Tech</span>
+                  <span class="material-symbols-outlined text-[14px]">expand_more</span>
+                </button>
+                <div id="ddAudienceMenu" class="hidden absolute left-0 mt-2 w-56 rounded-xl bg-surface-container-lowest border-[1.5px] border-primary shadow-[4px_4px_0px_#1c1b20] z-50 py-1.5 text-on-surface font-body-sm text-body-sm">
+                  <div class="px-3 py-1 font-label-sm uppercase text-on-surface-variant font-extrabold border-b border-primary/10">Select Audience</div>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Audience', 'Leadership & Technical Teams', 'Audience: Leadership & Tech')">Leadership &amp; Technical Teams</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Audience', 'Executive Leadership', 'Audience: Executive')">Executive Leadership</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Audience', 'SOC & Incident Response', 'Audience: SOC / IR')">SOC &amp; Incident Response</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Audience', 'Technical Engineers', 'Audience: Engineers')">Technical Engineers</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Audience', 'General Public', 'Audience: General Public')">General Public</button>
+                </div>
+              </div>
+
+              <!-- Dropdown 2: Tone & Style -->
+              <div class="relative inline-block text-left" id="ddToneContainer">
+                <button id="ddToneBtn" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-container-lowest border-[1.5px] border-primary text-on-surface font-label-sm text-label-sm transition-all hover:bg-surface-container-low hover:shadow-[2px_2px_0px_#1c1b20]" onclick="toggleDropdown('ddToneMenu', event)" type="button">
+                  <span id="ddToneText">Tone: Executive / Formal</span>
+                  <span class="material-symbols-outlined text-[14px]">expand_more</span>
+                </button>
+                <div id="ddToneMenu" class="hidden absolute left-0 mt-2 w-52 rounded-xl bg-surface-container-lowest border-[1.5px] border-primary shadow-[4px_4px_0px_#1c1b20] z-50 py-1.5 text-on-surface font-body-sm text-body-sm">
+                  <div class="px-3 py-1 font-label-sm uppercase text-on-surface-variant font-extrabold border-b border-primary/10">Select Tone</div>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Tone', 'Executive / Formal', 'Tone: Executive / Formal')">Executive / Formal</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Tone', 'Technical / Analytical', 'Tone: Technical / Analytical')">Technical / Analytical</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Tone', 'Urgent Advisory', 'Tone: Urgent Advisory')">Urgent Advisory</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Tone', 'Plain English', 'Tone: Plain English')">Plain English</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Tone', 'Informative', 'Tone: Informative')">Informative</button>
+                </div>
+              </div>
+
+              <!-- Dropdown 3: Language -->
+              <div class="relative inline-block text-left" id="ddLanguageContainer">
+                <button id="ddLanguageBtn" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-container-lowest border-[1.5px] border-primary text-on-surface font-label-sm text-label-sm transition-all hover:bg-surface-container-low hover:shadow-[2px_2px_0px_#1c1b20]" onclick="toggleDropdown('ddLanguageMenu', event)" type="button">
+                  <span id="ddLanguageText">Language: English</span>
+                  <span class="material-symbols-outlined text-[14px]">expand_more</span>
+                </button>
+                <div id="ddLanguageMenu" class="hidden absolute left-0 mt-2 w-44 rounded-xl bg-surface-container-lowest border-[1.5px] border-primary shadow-[4px_4px_0px_#1c1b20] z-50 py-1.5 text-on-surface font-body-sm text-body-sm">
+                  <div class="px-3 py-1 font-label-sm uppercase text-on-surface-variant font-extrabold border-b border-primary/10">Language</div>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Language', 'English', 'Language: English')">English</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Language', 'Hindi', 'Language: Hindi')">Hindi (हिंदी)</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Language', 'Spanish', 'Language: Spanish')">Spanish (Español)</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Language', 'French', 'Language: French')">French (Français)</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Language', 'German', 'Language: German')">German (Deutsch)</button>
+                </div>
+              </div>
+
+              <!-- Dropdown 4: Detail Level -->
+              <div class="relative inline-block text-left" id="ddDetailContainer">
+                <button id="ddDetailBtn" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-container-lowest border-[1.5px] border-primary text-on-surface font-label-sm text-label-sm transition-all hover:bg-surface-container-low hover:shadow-[2px_2px_0px_#1c1b20]" onclick="toggleDropdown('ddDetailMenu', event)" type="button">
+                  <span id="ddDetailText">Detail: High</span>
+                  <span class="material-symbols-outlined text-[14px]">expand_more</span>
+                </button>
+                <div id="ddDetailMenu" class="hidden absolute left-0 mt-2 w-48 rounded-xl bg-surface-container-lowest border-[1.5px] border-primary shadow-[4px_4px_0px_#1c1b20] z-50 py-1.5 text-on-surface font-body-sm text-body-sm">
+                  <div class="px-3 py-1 font-label-sm uppercase text-on-surface-variant font-extrabold border-b border-primary/10">Detail Level</div>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Detail', 'High', 'Detail: High')">High (Comprehensive)</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Detail', 'Medium', 'Detail: Medium')">Medium (Balanced)</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Detail', 'Executive Condensed', 'Detail: Condensed')">Executive Condensed</button>
+                </div>
+              </div>
+
+              <!-- Dropdown 5: Goal -->
+              <div class="relative inline-block text-left" id="ddGoalContainer">
+                <button id="ddGoalBtn" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-container-lowest border-[1.5px] border-primary text-on-surface font-label-sm text-label-sm transition-all hover:bg-surface-container-low hover:shadow-[2px_2px_0px_#1c1b20]" onclick="toggleDropdown('ddGoalMenu', event)" type="button">
+                  <span id="ddGoalText">Goal: Threat Advisory</span>
+                  <span class="material-symbols-outlined text-[14px]">expand_more</span>
+                </button>
+                <div id="ddGoalMenu" class="hidden absolute left-0 mt-2 w-52 rounded-xl bg-surface-container-lowest border-[1.5px] border-primary shadow-[4px_4px_0px_#1c1b20] z-50 py-1.5 text-on-surface font-body-sm text-body-sm">
+                  <div class="px-3 py-1 font-label-sm uppercase text-on-surface-variant font-extrabold border-b border-primary/10">Communication Goal</div>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Goal', 'Threat Advisory', 'Goal: Threat Advisory')">Threat Advisory</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Goal', 'Incident Response', 'Goal: Incident Response')">Incident Response</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Goal', 'Executive Brief', 'Goal: Executive Brief')">Executive Brief</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Goal', 'Compliance Directive', 'Goal: Compliance')">Compliance Directive</button>
+                  <button class="w-full text-left px-3 py-1.5 hover:bg-secondary-container transition-colors" onclick="selectParam('Goal', 'General Awareness', 'Goal: Awareness')">General Awareness</button>
+                </div>
+              </div>
+
+              <div class="ml-auto hidden sm:flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-tertiary-fixed border border-primary"></span>
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-bold" id="activeCounter">6 Deliverables Active</span>
+              </div>
+            </div>
+
+            <!-- ATTACHMENT & PROMPT INPUT ROW -->
+            <div class="flex items-center gap-space-sm pt-1">
+              <label class="group flex items-center gap-1.5 px-3 py-2 bg-surface-container-low border-[1.5px] border-primary rounded-xl cursor-pointer transition-all hover:bg-secondary-container hover:shadow-[2px_2px_0px_#1c1b20] flex-shrink-0">
+                <span class="material-symbols-outlined text-[18px] text-primary">attach_file</span>
+                <span class="font-label-sm text-label-sm text-primary select-none whitespace-nowrap hidden md:inline font-bold">Attach PDF, DOCX, or TXT</span>
+                <span class="font-label-sm text-label-sm text-primary select-none whitespace-nowrap inline md:hidden font-bold">Attach</span>
+                <input id="fileUploadInput" accept=".pdf,.docx,.txt" class="hidden" onchange="handleFileAttach(this)" type="file"/>
+              </label>
+              <div class="relative flex-1">
+                <input class="w-full bg-surface-container-lowest border-[1.5px] border-primary rounded-xl px-4 py-2 text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/45 focus:outline-none focus:shadow-[3px_3px_0px_#1c1b20] transition-shadow" id="promptInput" placeholder="Type your instructions or describe what you want to generate..." type="text"/>
+              </div>
+              <button aria-label="Send prompt" class="w-10 h-10 rounded-full bg-primary text-on-primary border-[1.5px] border-primary flex items-center justify-center flex-shrink-0 transition-all shadow-[2px_2px_0px_#deddff] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#deddff] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none" onclick="submitTransformation()" type="button">
+                <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+              </button>
+            </div>
+
+            <!-- FOOTER INFO STRIP -->
+            <div class="flex items-center justify-between mt-space-sm px-1 pt-1">
+              <div class="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-body-sm">
+                <span class="material-symbols-outlined text-[14px]">keyboard</span>
+                <span>Press <strong class="text-on-surface">Enter</strong> to transform</span>
+                <span class="text-outline-variant">•</span>
+                <span>Select or deselect formats above</span>
+              </div>
+              <div class="hidden items-center gap-1 text-on-surface font-label-sm text-label-sm bg-secondary-fixed border-[1.5px] border-primary px-2 py-0.5 rounded-full" id="fileIndicator">
+                <span class="material-symbols-outlined text-[12px]">description</span>
+                <span class="truncate max-w-[160px] font-bold" id="fileName">brief.pdf</span>
+                <span class="material-symbols-outlined text-[14px] cursor-pointer hover:text-error" onclick="removeAttachedFile(event)">close</span>
+              </div>
+            </div>
+
+            <!-- VALIDATION ALERT (hidden by default) -->
+            <div id="validationAlert" class="hidden mt-3 p-2.5 rounded-xl bg-error-container text-on-error-container border-[1.5px] border-primary font-body-sm flex items-center justify-between">
+              <span id="validationMsg">Please attach a source document or type instructions to transform.</span>
+              <span class="material-symbols-outlined text-[16px] cursor-pointer" onclick="this.parentElement.classList.add('hidden')">close</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Global parameters state
+    const params = {
+      audience: "Leadership & Technical Teams",
+      tone: "Executive / Formal",
+      language: "English",
+      detail: "High",
+      goal: "Threat Advisory"
+    };
+
+    let attachedFile = null;
+    let attachedFileDataUrl = null;
+
+    function toggleCard(card) {
+      const box = card.querySelector('.checkbox-box');
+      const icon = card.querySelector('.check-icon');
+      const isChecked = !icon.classList.contains('hidden');
+
+      if (isChecked) {
+        icon.classList.add('hidden');
+        box.classList.remove('bg-tertiary-fixed');
+        box.classList.add('bg-surface-container-lowest');
+        card.classList.add('opacity-70');
+        card.setAttribute('data-active', 'false');
+      } else {
+        icon.classList.remove('hidden');
+        box.classList.add('bg-tertiary-fixed');
+        box.classList.remove('bg-surface-container-lowest');
+        card.classList.remove('opacity-70');
+        card.setAttribute('data-active', 'true');
+      }
+      updateCounter();
+    }
+
+    function updateCounter() {
+      const total = document.querySelectorAll('.deliverable-card .check-icon:not(.hidden)').length;
+      const counter = document.getElementById('activeCounter');
+      if (counter) {
+        counter.textContent = `${total} Deliverables Active`;
+      }
+    }
+
+    function toggleDropdown(menuId, e) {
+      if (e) e.stopPropagation();
+      const allMenus = ['ddAudienceMenu', 'ddToneMenu', 'ddLanguageMenu', 'ddDetailMenu', 'ddGoalMenu'];
+      allMenus.forEach(id => {
+        const m = document.getElementById(id);
+        if (m) {
+          if (id === menuId) {
+            m.classList.toggle('hidden');
+          } else {
+            m.classList.add('hidden');
+          }
+        }
+      });
+    }
+
+    function selectParam(type, value, displayLabel) {
+      if (type === 'Audience') {
+        params.audience = value;
+        document.getElementById('ddAudienceText').textContent = displayLabel;
+        document.getElementById('ddAudienceMenu').classList.add('hidden');
+      } else if (type === 'Tone') {
+        params.tone = value;
+        document.getElementById('ddToneText').textContent = displayLabel;
+        document.getElementById('ddToneMenu').classList.add('hidden');
+      } else if (type === 'Language') {
+        params.language = value;
+        document.getElementById('ddLanguageText').textContent = displayLabel;
+        document.getElementById('ddLanguageMenu').classList.add('hidden');
+      } else if (type === 'Detail') {
+        params.detail = value;
+        document.getElementById('ddDetailText').textContent = displayLabel;
+        document.getElementById('ddDetailMenu').classList.add('hidden');
+      } else if (type === 'Goal') {
+        params.goal = value;
+        document.getElementById('ddGoalText').textContent = displayLabel;
+        document.getElementById('ddGoalMenu').classList.add('hidden');
+      }
+    }
+
+    window.addEventListener('click', function() {
+      const allMenus = ['ddAudienceMenu', 'ddToneMenu', 'ddLanguageMenu', 'ddDetailMenu', 'ddGoalMenu'];
+      allMenus.forEach(id => {
+        const m = document.getElementById(id);
+        if (m) m.classList.add('hidden');
+      });
+    });
+
+    function handleFileAttach(input) {
+      if (input.files && input.files[0]) {
+        attachedFile = input.files[0];
+        const indicator = document.getElementById('fileIndicator');
+        const nameEl = document.getElementById('fileName');
+        const titleEl = document.getElementById('transformationTitle');
+        nameEl.textContent = attachedFile.name;
+        if (titleEl) titleEl.textContent = attachedFile.name;
+        indicator.classList.remove('hidden');
+        indicator.classList.add('flex');
+
+        // Read file as base64 for session storage persistence
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          attachedFileDataUrl = e.target.result;
+        };
+        reader.readAsDataURL(attachedFile);
+      }
+    }
+
+    function removeAttachedFile(e) {
+      if (e) e.stopPropagation();
+      attachedFile = null;
+      attachedFileDataUrl = null;
+      const fileInput = document.getElementById('fileUploadInput');
+      if (fileInput) fileInput.value = '';
+      const indicator = document.getElementById('fileIndicator');
+      indicator.classList.add('hidden');
+      indicator.classList.remove('flex');
+      const titleEl = document.getElementById('transformationTitle');
+      if (titleEl) titleEl.textContent = 'Untitled Transformation';
+    }
+
+    function loadSampleProject(projectName) {
+      const titleEl = document.getElementById('transformationTitle');
+      const promptEl = document.getElementById('promptInput');
+      if (titleEl) titleEl.textContent = projectName;
+      if (promptEl) promptEl.value = `Analyze and transform cybersecurity advisory for ${projectName}`;
+      // Set default sample file representation
+      sessionStorage.setItem('secuscribe_file_name', `${projectName.toLowerCase().replace(/\\s+/g, '_')}.pdf`);
+      sessionStorage.setItem('secuscribe_file_size', '2.4 MB • 38 Pages');
+      sessionStorage.setItem('secuscribe_sample_mode', 'true');
+    }
+
+    function getSelectedDeliverables() {
+      const selected = [];
+      document.querySelectorAll('.deliverable-card').forEach(card => {
+        const icon = card.querySelector('.check-icon');
+        if (icon && !icon.classList.contains('hidden')) {
+          selected.push(card.getAttribute('data-format'));
+        }
+      });
+      return selected;
+    }
+
+    function submitTransformation() {
+      const input = document.getElementById('promptInput');
+      const text = input.value.trim();
+
+      if (!attachedFile && !text && !sessionStorage.getItem('secuscribe_sample_mode')) {
+        const alertEl = document.getElementById('validationAlert');
+        if (alertEl) alertEl.classList.remove('hidden');
+        return;
+      }
+
+      // Hide alert
+      const alertEl = document.getElementById('validationAlert');
+      if (alertEl) alertEl.classList.add('hidden');
+
+      const selectedDeliverables = getSelectedDeliverables();
+
+      // Store configuration in sessionStorage
+      const config = {
+        audience: params.audience,
+        tone: params.tone,
+        language: params.language,
+        detail: params.detail,
+        goal: params.goal,
+        prompt: text,
+        deliverables: selectedDeliverables,
+        fileName: attachedFile ? attachedFile.name : (sessionStorage.getItem('secuscribe_file_name') || 'SecuScribe_Brief.pdf'),
+        fileSize: attachedFile ? (attachedFile.size > 1048576 ? (attachedFile.size / 1048576).toFixed(1) + ' MB' : (attachedFile.size / 1024).toFixed(0) + ' KB') : '2.4 MB • 38 Pages'
+      };
+
+      sessionStorage.setItem('secuscribe_config', JSON.stringify(config));
+      sessionStorage.setItem('secuscribe_file_name', config.fileName);
+      sessionStorage.setItem('secuscribe_file_size', config.fileSize);
+
+      if (attachedFileDataUrl) {
+        sessionStorage.setItem('secuscribe_file_data', attachedFileDataUrl);
+      } else {
+        sessionStorage.removeItem('secuscribe_file_data');
+      }
+
+      // Navigate to processing screen
+      window.location.href = '03_processing.html';
+    }
+
+    document.getElementById('promptInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        submitTransformation();
+      }
+    });
+  </script>
+</body>
+</html>

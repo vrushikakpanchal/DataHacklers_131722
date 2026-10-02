@@ -1,5 +1,11 @@
 import os
+import logging
+
+logging.getLogger('weasyprint').setLevel(logging.ERROR)
+logging.getLogger('fontTools').setLevel(logging.ERROR)
+logging.getLogger('glib').setLevel(logging.ERROR)
 import json
+import re
 import ollama
 from html import escape
 from textwrap import wrap
@@ -206,30 +212,366 @@ def generate_pdf_advisory(canonical_facts: Dict[str, Any]) -> str:
 # ---------------------------------------------------------
 # 3. Social Media Generator (LinkedIn & Twitter/X)
 # ---------------------------------------------------------
-def generate_social_content(canonical_facts: Dict[str, Any], model_name: str = "qwen2.5:3b") -> Dict[str, Any]:
-    prompt = f"""
-    Transform the following security facts into two distinct social media posts:
-    1. LinkedIn Post: Professional, urgent alert format with bullet points, threat overview, action items, and relevant hashtags.
-    2. Twitter/X Thread: Exactly 3 numbered tweets. Keep each tweet strictly under 280 characters.
-    
-    Facts: {json.dumps(canonical_facts)}
-    
-    Return a strictly valid JSON object with keys: "linkedin_post" and "twitter_thread" (a list of 3 strings).
-    Do NOT include markdown formatting or extra text outside the JSON object.
-    """
-    
-    response = ollama.chat(
-        model=model_name,
-        messages=[{'role': 'user', 'content': prompt}],
-        format='json'
+def _social_list(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple, set)):
+        return [str(item).strip() for item in value if str(item).strip()]
+    text = str(value).strip()
+    return [text] if text else []
+
+
+def select_social_strategy(facts: Dict[str, Any], settings: Dict[str, Any] | None = None) -> Dict[str, str]:
+    """Select a source-grounded social archetype and tone using local rules."""
+    settings = settings or {}
+    severity = str(facts.get("severity", facts.get("risk_level", ""))).upper()
+    corpus = " ".join(str(facts.get(key, "")) for key in (
+        "title", "summary", "vulnerability", "technical_details", "key_findings", "impact", "recommendations"
+    )).lower()
+    exploited = any(marker in corpus for marker in (
+        "actively exploited", "known exploited", "exploitation in the wild", "cisa kev", "zero-day", "zero day"
+    ))
+    audience = str(settings.get("audience", settings.get("target_audience", ""))).lower()
+    objective = str(settings.get("objective", "")).lower()
+    technical_fields = any(_social_list(facts.get(key)) for key in (
+        "vulnerability", "technical_details", "attack_vector", "root_cause", "affected_versions"
+    ))
+    if severity in {"CRITICAL", "HIGH"} or exploited:
+        archetype, target_tone = "CRITICAL_ALERT", "Authoritative/Urgent"
+    elif technical_fields and (facts.get("cve_ids") or facts.get("cve_id") or facts.get("affected_systems") or facts.get("affected_products")):
+        archetype, target_tone = "TECHNICAL_BREAKDOWN", "Analytical"
+    elif any(term in audience + " " + objective for term in ("ciso", "leadership", "executive", "governance", "business")):
+        archetype, target_tone = "EXECUTIVE_SUMMARY", "Professional"
+    else:
+        archetype, target_tone = "EDUCATIONAL_INSIGHT", "Instructive"
+    return {"content_archetype": archetype, "target_tone": target_tone}
+
+
+def _social_fact_text(facts: Dict[str, Any], *keys: str, default: str = "") -> str:
+    for key in keys:
+        values = _social_list(facts.get(key))
+        if values:
+            return "; ".join(values)
+    return default
+
+
+def _fit_x_post(text: str, limit: int = 279) -> str:
+    text = " ".join(text.split())
+    if len(text) <= limit:
+        return text
+    shortened = text[:limit - 1].rsplit(" ", 1)[0].rstrip(" ,;:-")
+    return (shortened or text[:limit - 1]).rstrip() + "…"
+
+
+def _social_hashtags(archetype: str, facts: Dict[str, Any]) -> list[str]:
+    """Return a small, relevant, deterministic hashtag set."""
+    source_text = " ".join(str(facts.get(key, "")) for key in ("title", "vendor", "source", "affected_systems", "affected_products")).lower()
+    tags = ["#CyberSecurity"]
+    if archetype == "CRITICAL_ALERT":
+        tags.append("#PatchAlert")
+        if "cisco" in source_text or any(model in source_text for model in ("rv160", "rv260", "rv340", "rv345")):
+            tags.append("#Cisco")
+        else:
+            tags.append("#PatchManagement")
+    elif archetype == "TECHNICAL_BREAKDOWN":
+        if "cisco" in source_text or any(model in source_text for model in ("rv160", "rv260", "rv340", "rv345")):
+            tags.append("#Cisco")
+        tags.append("#VulnerabilityManagement")
+    elif archetype == "EXECUTIVE_SUMMARY":
+        tags.append("#RiskManagement")
+    else:
+        tags.append("#SecurityAwareness")
+    return tags[:3]
+
+
+def _normalize_linkedin_hashtags(post: str, archetype: str, facts: Dict[str, Any]) -> str:
+    without_tags = re.sub(r"(?<!\w)#[A-Za-z0-9_]+", "", post)
+    body = re.sub(r"[ \t]+", " ", without_tags)
+    body = re.sub(r"\n(?:[ \t]*\n){2,}", "\n\n", body).strip()
+    return f"{body}\n\n{' '.join(_social_hashtags(archetype, facts))}".strip()
+
+
+def _normalize_x_text(text: str, archetype: str, facts: Dict[str, Any], include_tag: bool = True) -> str:
+    without_tags = re.sub(r"(?<!\w)#[A-Za-z0-9_]+", "", text)
+    tag = _social_hashtags(archetype, facts)[0] if include_tag else ""
+    return _fit_x_post(f"{without_tags.strip()} {tag}".strip())
+
+
+def _clip_words(value: str, limit: int) -> str:
+    words = value.split()
+    if len(words) <= limit:
+        return value
+    return " ".join(words[:limit]).rstrip(" ,;:-") + "…"
+
+
+def _word_count(value: str) -> int:
+    return len(re.findall(r"\b[\w#-]+\b", value, flags=re.UNICODE))
+
+
+def _structured_linkedin_post(facts: Dict[str, Any], archetype: str) -> str:
+    """Build a detailed, operational LinkedIn layout for urgent/technical notices."""
+    title = _clip_words(str(facts.get("title") or "Security Advisory").strip(), 14)
+    severity = str(facts.get("severity") or facts.get("risk_level") or "Unspecified").strip()
+    cves = _social_list(facts.get("cve_ids") or facts.get("cve_id"))
+    products = _social_list(facts.get("affected_systems") or facts.get("affected_products"))
+    summary = _clip_words(str(facts.get("summary") or "").strip(), 34)
+    technical = _clip_words(_social_fact_text(facts, "root_cause", "vulnerability", "technical_details", "attack_vector", default="").strip(), 32)
+    interface = _clip_words(_social_fact_text(facts, "affected_interface", "affected_interfaces", "interface", "interface_name", "network_interface", "attack_surface", "management_interface", default="").strip(), 12)
+    impacts = _clip_words(_social_fact_text(facts, "impact", "business_impact", default="").strip(), 22)
+    source_actions = [_clip_words(action, 22) for action in _social_list(facts.get("recommended_actions") or facts.get("recommendations") or facts.get("mitigation_steps"))[:2]]
+
+    context_parts = [f"Severity is {severity}."]
+    if cves:
+        context_parts.append(f"Advisory identifier: {', '.join(cves[:4])}.")
+    if summary:
+        context_parts.append(summary)
+    if technical and technical.casefold() not in summary.casefold():
+        context_parts.append(f"Root cause / technical detail: {technical}")
+    if interface:
+        context_parts.append(f"Affected interface or attack surface: {interface}.")
+    scope_paragraph = (
+        "Network and SOC teams should validate exposure against their own asset inventory. Confirm which listed models and versions are deployed, "
+        "whether the relevant interface is enabled and reachable, and which systems require immediate owner review. This post summarizes advisory facts; "
+        "it does not assert that a particular organization is exposed or compromised."
     )
-    
-    social_data = json.loads(response['message']['content'])
-    output_path = os.path.join(OUTPUT_DIR, "social_posts.json")
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(social_data, f, indent=2)
-        
-    return social_data
+    affected_lines = [f"- {product}" for product in products[:8]]
+    if len(products) > 8:
+        affected_lines.append(f"- Plus {len(products) - 8} additional source-listed products; consult the advisory for the full list.")
+    if not affected_lines:
+        affected_lines = ["- Product or model names were not identified in the supplied facts; confirm scope in the source advisory."]
+
+    actions = [f"{index}. {action}" for index, action in enumerate(source_actions, start=1)]
+    next_number = len(actions) + 1
+    actions.extend([
+        f"{next_number}. Compare deployed models and versions with the affected scope; identify internet-facing or otherwise reachable management interfaces.",
+        f"{next_number + 1}. Apply the vendor-approved patch or mitigation, following the source advisory and local change-control process.",
+        f"{next_number + 2}. Where patching is pending, apply source-approved interim controls and restrict relevant access where operationally safe.",
+        f"{next_number + 3}. Verify the remediated version, record owner and completion evidence, and review vendor-provided detection guidance with the SOC.",
+    ])
+    if impacts:
+        context_parts.append(f"Source-reported impact: {impacts}.")
+
+    heading = "CRITICAL SECURITY ALERT" if archetype == "CRITICAL_ALERT" else "TECHNICAL SECURITY BREAKDOWN"
+    sections = [
+        f"{heading}: {title}",
+        " ".join(context_parts),
+        scope_paragraph,
+        "Affected models/products:\n" + "\n".join(affected_lines),
+        "Required action plan for Network / IT / SOC teams:\n" + "\n".join(actions),
+        "After remediation, retain the affected-asset list, approved change record, validation results, and any escalation notes together. Share status with system owners and incident leadership, and keep unresolved assets visible until their exposure is addressed or formally accepted.",
+    ]
+    return "\n\n".join(sections)
+
+
+def _rule_based_social_content(facts: Dict[str, Any], strategy: Dict[str, str]) -> Dict[str, Any]:
+    """Build safe fallback copy using only supplied facts and deterministic phrasing."""
+    archetype = strategy["content_archetype"]
+    title = str(facts.get("title") or "Security update").strip()
+    severity = str(facts.get("severity") or facts.get("risk_level") or "Unspecified").strip()
+    summary = str(facts.get("summary") or facts.get("vulnerability") or "Review the source advisory for details.").strip()
+    cves = _social_list(facts.get("cve_ids") or facts.get("cve_id"))
+    affected = _social_list(facts.get("affected_systems") or facts.get("affected_products"))
+    actions = _social_list(facts.get("recommended_actions") or facts.get("recommendations") or facts.get("mitigation_steps"))
+    impact = _social_fact_text(facts, "impact", "business_impact", default="")
+    technical = _social_fact_text(facts, "root_cause", "vulnerability", "technical_details", "attack_vector", default=summary)
+    identifiers = ", ".join(cves)
+    affected_text = ", ".join(affected)
+    action_text = "; ".join(actions)
+    hashtags = " ".join(_social_hashtags(archetype, facts))
+
+    if archetype == "CRITICAL_ALERT":
+        linkedin = _structured_linkedin_post(facts, archetype)
+        x_post = f"Critical security alert: {title}. {identifiers + '. ' if identifiers else ''}Severity {severity}. {action_text or 'Review affected systems and apply source-approved mitigations.'} #CyberSecurity"
+    elif archetype == "TECHNICAL_BREAKDOWN":
+        linkedin = _structured_linkedin_post(facts, archetype)
+        x_post = f"{title}: {technical} {identifiers + '. ' if identifiers else ''}{action_text or 'Follow the advisory for mitigation steps.'} #CyberSecurity"
+    elif archetype == "EXECUTIVE_SUMMARY":
+        linkedin_parts = [f"Executive security update: {title}", summary]
+        if impact: linkedin_parts.append(f"Business impact: {impact}")
+        if affected_text: linkedin_parts.append(f"Risk exposure: {affected_text}")
+        if action_text: linkedin_parts.append(f"Governance action: {action_text}")
+        linkedin = "\n\n".join(linkedin_parts + ["#CyberSecurity #RiskManagement"])
+        x_post = f"Executive security update: {title}. {impact or summary} {action_text or 'Review exposure and track remediation.'} #CyberSecurity"
+    else:
+        linkedin = "\n\n".join([
+            f"Security learning: {title}",
+            f"{summary}",
+            "Key takeaway: Regularly review advisories, affected assets, and recommended safeguards.",
+            f"Action to consider: {action_text}" if action_text else "Action to consider: Review your security hygiene and apply relevant safeguards.",
+            "#CyberSecurity #SecurityAwareness",
+        ])
+        x_post = f"Security takeaway: {summary} {action_text or 'Review current advisories and keep safeguards up to date.'} #SecurityAwareness"
+
+    hook = f"Hook: {title}{': ' + identifiers if identifiers else ''}. Severity: {severity}."
+    impact_text = _social_fact_text(facts, "impact", "business_impact", default="")
+    if not impact_text:
+        impact_text = summary if summary not in title else technical
+    impact_tweet = f"Impact: {impact_text or 'Review the advisory to understand the affected scope.'}"
+    mitigation_tweet = f"Mitigation: {action_text or 'Follow the vendor-approved remediation in the source advisory.'}"
+    references = _social_list(facts.get("references") or facts.get("reference_urls"))
+    reference_text = ", ".join(references[:2]) or ", ".join(cves) or title + " advisory"
+    thread = [
+        _fit_x_post(hook),
+        _fit_x_post(impact_tweet),
+        _fit_x_post(mitigation_tweet),
+        _normalize_x_text(f"Reference: {reference_text}", archetype, facts),
+    ]
+    return {
+        "linkedin_post": linkedin,
+        "x_post": _normalize_x_text(x_post, archetype, facts),
+        "x_thread": thread,
+        # Legacy aliases retained for existing GUI callers.
+        "linkedin": linkedin,
+        "twitter_thread": thread,
+    }
+
+
+def generate_social_content(
+    canonical_facts: Dict[str, Any],
+    model_name: str = "qwen2.5:3b",
+    *,
+    strategy: Dict[str, str] | None = None,
+    settings: Dict[str, Any] | None = None,
+    platform: str = "both",
+) -> Dict[str, Any]:
+    """Generate archetype-aware social content locally, with a deterministic fallback."""
+    settings = settings or {}
+    strategy = strategy or select_social_strategy(canonical_facts, settings)
+    archetype = strategy.get("content_archetype", "EDUCATIONAL_INSIGHT")
+    tone = strategy.get("target_tone", "Professional")
+    linkedin_guidance = {
+        "CRITICAL_ALERT": (
+            "Write an authoritative, structured LinkedIn alert for Network and IT professionals. Start with a high-impact headline. "
+            "Give a brief vulnerability summary and root cause; describe Remote Code Execution as root only if that exact fact is in the source. "
+            "Add a bulleted affected-model list using only products present in the facts (for example RV160, RV260, RV340, RV345 when listed). "
+            "Follow this layout: line 1 urgent headline; one threat-context paragraph with CVE, affected interface, and remote-root-execution risk only when source-supported; "
+            "bulleted affected models/products; numbered action plan for IT/SOC teams. Target 150-250 words."
+        ),
+        "TECHNICAL_BREAKDOWN": (
+            "Use the same professional structure: line 1 urgent technical headline; a threat-context paragraph with CVE, affected interface, root cause, "
+            "and remote-root-execution risk only when source-supported; bulleted affected models/products; numbered action plan for IT/SOC teams. "
+            "Target 150-250 words and explain technical details without adding unsupported claims."
+        ),
+        "EXECUTIVE_SUMMARY": "Focus on business impact, exposure, and governance recommendations. Avoid unsupported technical claims.",
+        "EDUCATIONAL_INSIGHT": "Use an instructive narrative, a clear takeaway, and practical security hygiene guidance grounded in the facts.",
+    }.get(archetype, "Write a clear, source-grounded professional update.")
+    prompt = f"""
+You are a careful cybersecurity social-media editor. Generate content using ONLY the facts below.
+Do not invent CVEs, affected products, exploitation status, impact, metrics, links, or mitigations.
+Selected archetype: {archetype}
+Target tone: {tone}
+LinkedIn strategy: {linkedin_guidance}
+Audience: {settings.get('audience', 'Security professionals')}
+Operator tone preference: {settings.get('operator_tone', settings.get('tone', tone))}
+
+Return JSON with exactly these required keys:
+{{"linkedin_post":"...", "x_post":"...", "x_thread":["...", "...", "..."]}}
+LinkedIn should follow the selected strategy. For CRITICAL_ALERT and TECHNICAL_BREAKDOWN, produce 150-250 words using the required four-part structured layout.
+Place no more than 3 relevant hashtags naturally at the very end.
+Do not use generic or irrelevant hashtags, including #malicious. Do not put hashtags in the middle of the post.
+x_post must be a single punchy post strictly under 280 characters with relevant hashtags.
+x_thread must contain 3 or 4 distinct, non-redundant posts, each strictly under 280 characters, preferably 4, in this order: Hook, Impact, Mitigation, Reference.
+Start each tweet with its matching label. For a 3-tweet thread, combine the last two labels as "Mitigation / Reference:". Include a CVE in the hook/reference when available.
+Omit unavailable facts rather than guessing; do not create generic filler tweets or repeat the same point.
+Return no markdown or surrounding explanation.
+
+FACTS:
+{json.dumps(canonical_facts, ensure_ascii=False)}
+"""
+    try:
+        response = ollama.chat(
+            model=model_name,
+            messages=[{"role": "user", "content": prompt}],
+            format="json",
+        )
+        raw_content = response["message"]["content"]
+        social_data = json.loads(raw_content)
+        linkedin = str(social_data.get("linkedin_post") or social_data.get("linkedin") or "").strip()
+        x_post = str(social_data.get("x_post") or "").strip()
+        raw_thread = social_data.get("x_thread") or social_data.get("twitter_thread") or []
+        if isinstance(raw_thread, str):
+            raw_thread = [raw_thread]
+        thread = [str(post).strip() for post in raw_thread if str(post).strip()]
+        if not linkedin or not x_post or not 3 <= len(thread) <= 4:
+            raise ValueError("Ollama social response did not meet the required post schema or length limits")
+        if archetype in {"CRITICAL_ALERT", "TECHNICAL_BREAKDOWN"}:
+            if not 150 <= _word_count(linkedin) <= 250:
+                raise ValueError("Structured LinkedIn output is outside the 150-250 word target")
+            if not re.search(r"(?im)^.*(?:critical security alert|technical security alert|security breakdown).+", linkedin.splitlines()[0]):
+                raise ValueError("Structured LinkedIn output is missing its urgent headline")
+            if not re.search(r"(?im)^affected (?:models|models/products|products):", linkedin):
+                raise ValueError("Structured LinkedIn output is missing the affected-model section")
+            if not re.search(r"(?im)^required action plan for (?:network / it / soc|it/soc|network / it) teams:", linkedin):
+                raise ValueError("Structured LinkedIn output is missing its numbered action plan")
+            affected_models = _social_list(canonical_facts.get("affected_systems") or canonical_facts.get("affected_products"))
+            has_numbered_plan = bool(re.search(r"(?m)^\s*1[.)]\s+", linkedin))
+            models_are_bulleted = all(
+                re.search(r"(?im)^\s*[-*•]\s+.*" + re.escape(model), linkedin)
+                for model in affected_models
+            )
+            if not has_numbered_plan or (affected_models and not models_are_bulleted):
+                raise ValueError("Critical LinkedIn output omitted its numbered action plan or affected-model bullets")
+        result = {
+            "linkedin_post": linkedin,
+            "x_post": x_post,
+            "x_thread": thread,
+            "linkedin": linkedin,
+            "twitter_thread": thread,
+        }
+    except Exception:
+        logging.getLogger(__name__).exception("Local social generation failed; using deterministic %s fallback", archetype)
+        result = _rule_based_social_content(canonical_facts, strategy)
+
+    result["linkedin_post"] = _normalize_linkedin_hashtags(result.get("linkedin_post", result.get("linkedin", "")), archetype, canonical_facts)
+    result["linkedin"] = result["linkedin_post"]
+    result["x_post"] = _normalize_x_text(result.get("x_post", ""), archetype, canonical_facts)
+    normalized_thread = []
+    seen_tweets = set()
+    for post in result.get("x_thread", result.get("twitter_thread", [])):
+        clean_post = _normalize_x_text(str(post), archetype, canonical_facts, include_tag=False)
+        fingerprint = " ".join(clean_post.split()).casefold()
+        if clean_post and fingerprint not in seen_tweets:
+            normalized_thread.append(clean_post)
+            seen_tweets.add(fingerprint)
+    if len(normalized_thread) < 3:
+        result = _rule_based_social_content(canonical_facts, strategy)
+        result["linkedin_post"] = _normalize_linkedin_hashtags(result["linkedin_post"], archetype, canonical_facts)
+        result["linkedin"] = result["linkedin_post"]
+        normalized_thread = [
+            _normalize_x_text(str(post), archetype, canonical_facts, include_tag=False)
+            for post in result["x_thread"]
+        ]
+    if normalized_thread:
+        roles = ["Hook", "Impact", "Mitigation / Reference"] if len(normalized_thread) == 3 else ["Hook", "Impact", "Mitigation", "Reference"]
+        labeled_thread = []
+        for post, role in zip(normalized_thread, roles):
+            content = re.sub(r"^(?:Hook|Impact|Mitigation(?: / Reference)?|Reference)\s*:\s*", "", post, flags=re.IGNORECASE)
+            labeled_thread.append(_normalize_x_text(f"{role}: {content}", archetype, canonical_facts, include_tag=False))
+        normalized_thread = labeled_thread
+        normalized_thread[-1] = _normalize_x_text(normalized_thread[-1], archetype, canonical_facts)
+    result["x_thread"] = normalized_thread[:4]
+    result["twitter_thread"] = result["x_thread"]
+
+    if archetype in {"CRITICAL_ALERT", "TECHNICAL_BREAKDOWN"} and not 150 <= _word_count(result["linkedin_post"]) <= 250:
+        result = _rule_based_social_content(canonical_facts, strategy)
+        result["linkedin_post"] = _normalize_linkedin_hashtags(result["linkedin_post"], archetype, canonical_facts)
+        result["linkedin"] = result["linkedin_post"]
+        result["x_post"] = _normalize_x_text(result.get("x_post", ""), archetype, canonical_facts)
+        result["x_thread"] = result["x_thread"][:4]
+        result["twitter_thread"] = result["x_thread"]
+
+    selected = str(platform or "both").lower()
+    if selected == "linkedin":
+        result.update({"x_post": "", "x_thread": [], "twitter_thread": []})
+    elif selected in {"x", "twitter"}:
+        result.update({"linkedin_post": "", "linkedin": ""})
+    try:
+        output_path = os.path.join(OUTPUT_DIR, "social_posts.json")
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
+    except OSError:
+        logging.getLogger(__name__).warning("Could not save generated social_posts.json", exc_info=True)
+    return result
 
 
 # ---------------------------------------------------------

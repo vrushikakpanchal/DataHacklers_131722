@@ -1,0 +1,16 @@
+flask
+fastapi
+uvicorn
+jinja2
+pydantic
+python-dotenv
+requests
+python-multipart
+google-generativeai
+pyttsx3
+moviepy
+pillow
+reportlab
+pypdf
+pdfplumber
+docutils

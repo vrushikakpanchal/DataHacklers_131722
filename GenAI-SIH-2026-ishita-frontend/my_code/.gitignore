@@ -1,0 +1,24 @@
+# Python virtual environment
+venv/
+ENV/
+env/
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data & Output Files (Prevents leaks of sensitive test documents)
+data/outputs/*
+!data/outputs/.gitkeep
+data/sample_inputs/*
+!data/sample_inputs/.gitkeep
+
+# Environment variables & secrets
+.env
+*.pem
+*.key
+
+# IDE specific files
+.vscode/
+.idea/

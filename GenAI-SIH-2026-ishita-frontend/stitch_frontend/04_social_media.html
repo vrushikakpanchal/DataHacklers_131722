@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="web_standard" name="shell-type"/>
+  <title>SecuScribe | Social Dispatch Orchestrator</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-tertiary": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "surface": "#f9f9fb",
+            "on-surface-variant": "#48464b",
+            "secondary-container": "#deddff",
+            "inverse-primary": "#c9c5cc",
+            "surface-container": "#eeeef0",
+            "on-secondary": "#ffffff",
+            "tertiary-fixed": "#c8f250",
+            "on-primary-fixed": "#1c1b20",
+            "inverse-surface": "#2f3132",
+            "on-primary-container": "#858389",
+            "primary": "#000000",
+            "tertiary-container": "#161f00",
+            "on-primary-fixed-variant": "#48464c",
+            "surface-variant": "#e2e2e4",
+            "on-secondary-fixed": "#181932",
+            "surface-tint": "#605d63",
+            "surface-bright": "#f9f9fb",
+            "secondary-fixed-dim": "#c4c4e5",
+            "surface-dim": "#d9dadc",
+            "inverse-on-surface": "#f0f0f2",
+            "primary-container": "#1c1b20",
+            "surface-container-low": "#f3f3f5",
+            "tertiary": "#000000",
+            "primary-fixed-dim": "#c9c5cc",
+            "background": "#f9f9fb",
+            "on-tertiary-fixed-variant": "#3b4d00",
+            "on-tertiary-fixed": "#161f00",
+            "on-surface": "#1a1c1d",
+            "tertiary-fixed-dim": "#add534",
+            "on-background": "#1a1c1d",
+            "on-error-container": "#93000a",
+            "on-error": "#ffffff",
+            "secondary-fixed": "#e1e0ff",
+            "on-secondary-fixed-variant": "#444460",
+            "surface-container-high": "#e8e8ea",
+            "error": "#ba1a1a",
+            "primary-fixed": "#e5e1e8",
+            "on-tertiary-container": "#708f00",
+            "on-primary": "#ffffff",
+            "outline": "#79767b",
+            "on-secondary-container": "#60607d",
+            "surface-container-highest": "#e2e2e4",
+            "secondary": "#5b5c79",
+            "outline-variant": "#c9c5cb",
+            "error-container": "#ffdad6"
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px"
+          },
+          spacing: {
+            margin: "2rem",
+            "space-md": "1rem",
+            "space-sm": "0.5rem",
+            "gutter-sm": "1rem",
+            "space-xs": "0.25rem",
+            gutter: "1.5rem",
+            "space-lg": "1.5rem",
+            "space-xl": "2.5rem",
+            "margin-sm": "1rem"
+          },
+          fontFamily: {
+            "label-sm": ["Plus Jakarta Sans"],
+            "headline-xl-mobile": ["Plus Jakarta Sans"],
+            "title-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-sm": ["Inter"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"]
+          },
+          fontSize: {
+            "label-sm": ["10px", { lineHeight: "14px", letterSpacing: "0.05em", fontWeight: "800" }],
+            "headline-xl-mobile": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "title-md": ["16px", { lineHeight: "24px", letterSpacing: "-0.005em", fontWeight: "600" }],
+            "body-lg": ["16px", { lineHeight: "26px", letterSpacing: "0em", fontWeight: "400" }],
+            "headline-xl": ["48px", { lineHeight: "56px", letterSpacing: "-0.03em", fontWeight: "800" }],
+            "headline-lg": ["36px", { lineHeight: "44px", letterSpacing: "-0.025em", fontWeight: "700" }],
+            "headline-lg-mobile": ["26px", { lineHeight: "34px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "body-md": ["14px", { lineHeight: "22px", letterSpacing: "0em", fontWeight: "400" }],
+            "headline-md": ["24px", { lineHeight: "32px", letterSpacing: "-0.015em", fontWeight: "700" }],
+            "headline-sm": ["20px", { lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "600" }],
+            "body-sm": ["12px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "400" }],
+            "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.03em", fontWeight: "700" }],
+            "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.02em", fontWeight: "700" }]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface-container-lowest font-body-md text-on-surface antialiased min-h-screen">
+  <!-- TOP GLOBAL HEADER -->
+  <header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest border-b-[1.5px] border-primary">
+    <div class="h-16 px-gutter flex items-center justify-between border-b-[1.5px] border-primary">
+      <div class="flex items-center gap-space-md">
+        <span class="font-headline-sm text-headline-sm uppercase tracking-tight text-primary font-extrabold">SECUSCRIBE</span>
+      </div>
+      <div class="flex items-center gap-space-sm">
+        <div class="inline-flex items-center gap-space-xs px-3 py-1 rounded-full border-[1.5px] border-primary bg-surface-container-low">
+          <span class="material-symbols-outlined text-[16px] text-on-surface">description</span>
+          <span class="font-label-md text-label-md text-on-surface truncate max-w-xs" id="navFileName">Q3_Strategic_Brief.pdf</span>
+        </div>
+        <span class="px-2 py-0.5 rounded-full border-[1.5px] border-primary bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm uppercase font-bold">Enterprise</span>
+      </div>
+      <div class="flex items-center gap-space-md">
+        <a class="inline-flex items-center gap-space-xs px-4 py-1.5 rounded-full border-[1.5px] border-primary bg-surface-container-lowest text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors shadow-[2px_2px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none" href="03_processing.html">
+          <span class="material-symbols-outlined text-[16px]">arrow_back</span>Back to All Deliverables
+        </a>
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center border-[1.5px] border-primary">
+          <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+        </div>
+      </div>
+    </div>
+    <!-- DELIVERABLE TABS STRIP -->
+    <div class="h-14 px-gutter flex items-center bg-surface-container-low">
+      <nav class="flex items-center gap-space-sm overflow-x-auto py-1">
+        <a aria-current="page" class="px-4 py-1.5 rounded-full transition-all bg-secondary-container text-on-surface font-bold border-[1.5px] border-primary shadow-[2px_2px_0px_#000000]" href="04_social_media.html">LinkedIn &amp; X</a>
+        <a class="px-4 py-1.5 rounded-full border-[1.5px] border-transparent font-label-md text-label-md text-on-surface-variant hover:border-primary hover:text-on-surface hover:bg-surface-container-lowest transition-all" href="05_video.html">Video</a>
+        <a class="px-4 py-1.5 rounded-full border-[1.5px] border-transparent font-label-md text-label-md text-on-surface-variant hover:border-primary hover:text-on-surface hover:bg-surface-container-lowest transition-all" href="javascript:void(0)" onclick="downloadAdvisoryPdf()">Advisory</a>
+        <a class="px-4 py-1.5 rounded-full border-[1.5px] border-transparent font-label-md text-label-md text-on-surface-variant hover:border-primary hover:text-on-surface hover:bg-surface-container-lowest transition-all" href="06_summary.html">Summary</a>
+        <a class="px-4 py-1.5 rounded-full border-[1.5px] border-transparent font-label-md text-label-md text-on-surface-variant hover:border-primary hover:text-on-surface hover:bg-surface-container-lowest transition-all" href="javascript:void(0)" onclick="downloadPresentationPptx()">Slides</a>
+        <a class="px-4 py-1.5 rounded-full border-[1.5px] border-transparent font-label-md text-label-md text-on-surface-variant hover:border-primary hover:text-on-surface hover:bg-surface-container-lowest transition-all" href="javascript:void(0)" onclick="downloadInfographicSvg()">Data Table</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="w-full pt-[7.5rem] bg-surface-container-lowest px-gutter pb-space-xl">
+    <div class="flex flex-col w-full max-w-7xl mx-auto py-space-md">
+      <!-- Breadcrumb & Mode Meta Header -->
+      <div class="flex flex-wrap items-center justify-between gap-space-md pb-space-lg">
+        <div class="flex items-center gap-space-sm">
+          <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-surface-container-low text-on-surface border-[1.5px] border-primary">
+            <span class="material-symbols-outlined text-[18px]">share</span>
+          </span>
+          <div class="flex items-center gap-space-xs">
+            <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider font-bold">Deliverable 01</span>
+            <span class="text-on-surface-variant">/</span>
+            <span class="font-headline-sm text-headline-sm text-primary font-bold">Social Dispatch Orchestrator</span>
+          </div>
+        </div>
+        <!-- Active Pipeline Stage Pill Cluster -->
+        <div class="flex items-center gap-space-sm">
+          <div class="inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-surface-container-lowest border-[1.5px] border-primary shadow-[2px_2px_0px_#000000]">
+            <span class="w-2 h-2 rounded-full bg-tertiary-fixed border border-primary"></span>
+            <span class="font-label-sm text-label-sm uppercase text-on-surface font-bold">Target Channel: LinkedIn Core</span>
+          </div>
+          <div class="inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-secondary-container border-[1.5px] border-primary shadow-[2px_2px_0px_#000000]">
+            <span class="font-label-sm text-label-sm uppercase text-on-surface font-bold">Engine: SecuScribe Synthesizer</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main 50/50 Workspace Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter items-start">
+        <!-- LEFT COLUMN: Clean Text Box & Actions -->
+        <div class="flex flex-col gap-space-md">
+          <!-- Column Header -->
+          <div class="flex items-center justify-between px-1">
+            <div class="flex items-center gap-space-xs">
+              <span class="material-symbols-outlined text-primary text-[20px]">edit_note</span>
+              <h2 class="font-title-md text-title-md text-primary font-bold">Generated Post Copy</h2>
+            </div>
+            <div class="inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-surface-container-low border-[1.5px] border-primary">
+              <span class="material-symbols-outlined text-[14px] text-on-surface-variant">straighten</span>
+              <span class="font-label-sm text-label-sm text-on-surface font-bold" id="charCountBadge">142 words • Markdown Mode</span>
+            </div>
+          </div>
+
+          <!-- Editor Container -->
+          <div class="relative flex flex-col bg-surface-container-lowest rounded-xl border-[1.5px] border-primary shadow-[4px_4px_0px_#1c1b20] overflow-hidden">
+            <!-- Editor Toolbar Ribbon -->
+            <div class="flex items-center justify-between px-space-md py-2 bg-surface-container-low border-b-[1.5px] border-primary">
+              <div class="flex items-center gap-space-xs">
+                <button class="p-1 rounded hover:bg-surface-container-highest transition-colors text-on-surface" title="Bold" type="button" onclick="formatSelection('**')">
+                  <span class="material-symbols-outlined text-[18px]">format_bold</span>
+                </button>
+                <button class="p-1 rounded hover:bg-surface-container-highest transition-colors text-on-surface" title="Italic" type="button" onclick="formatSelection('*')">
+                  <span class="material-symbols-outlined text-[18px]">format_italic</span>
+                </button>
+                <button class="p-1 rounded hover:bg-surface-container-highest transition-colors text-on-surface" title="List" type="button" onclick="formatSelection('• ')">
+                  <span class="material-symbols-outlined text-[18px]">format_list_bulleted</span>
+                </button>
+                <span class="w-[1.5px] h-4 bg-outline-variant mx-1"></span>
+                <button class="p-1 rounded hover:bg-surface-container-highest transition-colors text-on-surface" title="Code Format" type="button" onclick="formatSelection('`')">
+                  <span class="material-symbols-outlined text-[18px]">code</span>
+                </button>
+              </div>
+              <div class="flex items-center gap-space-xs">
+                <span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed border border-primary"></span>
+                  Auto-synced
+                </span>
+              </div>
+            </div>
+
+            <!-- Editor Surface with Line Numbers -->
+            <div class="flex w-full min-h-[440px] bg-surface-container-lowest">
+              <!-- Gutter Line Numbers -->
+              <div class="hidden sm:flex flex-col select-none py-space-md px-3 bg-surface-container-low border-r-[1.5px] border-primary text-right font-mono text-[12px] leading-[24px] text-on-surface-variant/70">
+                <span>01</span><span>02</span><span>03</span><span>04</span><span>05</span>
+                <span>06</span><span>07</span><span>08</span><span>09</span><span>10</span>
+                <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+                <span>16</span><span>17</span><span>18</span>
+              </div>
+              <!-- Live Textarea -->
+              <div class="relative flex-1 p-space-md">
+                <textarea class="w-full h-full min-h-[400px] bg-transparent resize-none outline-none font-body-md text-body-md text-on-surface leading-[24px] focus:outline-none placeholder-on-surface/45" id="postSourceInput" spellcheck="false">Accelerating Operational Velocity with Deterministic Intelligence
+
+The Q3 operational benchmark reveals a critical shift: resource allocation is moving away from ad-hoc asynchronous workflows toward deterministic pipelines. Teams executing with unified orchestration reported a 34% speed gain across multi-vector operations.
+
+Key operational takeaways:
+• Complete entity parity maintained across all outputs
+• Zero hallucination drift on mission-critical assets
+• Rapid 6-channel parallel synthesis in <90 seconds
+
+#TechInsights #Automation #AIArchitecture #EnterpriseOps</textarea>
+              </div>
+            </div>
+
+            <!-- Editor Bottom Status strip -->
+            <div class="flex items-center justify-between px-space-md py-2 bg-surface-container-lowest border-t-[1.5px] border-primary text-on-surface-variant font-body-sm text-body-sm">
+              <div class="flex items-center gap-space-sm font-mono text-[11px]">
+                <span>Encoding: UTF-8</span>
+                <span>•</span>
+                <span>Format: Standard Plaintext</span>
+              </div>
+              <span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary uppercase font-bold">
+                <span class="material-symbols-outlined text-[15px]">verified</span> Validated Schema
+              </span>
+            </div>
+          </div>
+
+          <!-- Action Bar (Strictly 2 buttons as specified) -->
+          <div class="flex items-center gap-space-md pt-space-xs">
+            <button class="flex-1 inline-flex items-center justify-center gap-space-xs px-6 py-3 rounded-full bg-primary text-on-primary border-[1.5px] border-primary font-label-lg text-label-lg shadow-[4px_4px_0px_#deddff] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#deddff] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all cursor-pointer font-bold" id="btnCopyText" type="button">
+              <span class="material-symbols-outlined text-[18px]">content_copy</span>
+              <span id="copyBtnText">Copy Text</span>
+            </button>
+            <button class="flex-1 inline-flex items-center justify-center gap-space-xs px-6 py-3 rounded-full bg-surface-container-lowest text-primary border-[1.5px] border-primary font-label-lg text-label-lg shadow-[4px_4px_0px_#1c1b20] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#1c1b20] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all cursor-pointer font-bold" id="btnDownloadTxt" type="button">
+              <span class="material-symbols-outlined text-[18px]">download</span>
+              <span>Download .TXT</span>
+            </button>
+          </div>
+
+          <!-- Compliance Mini Callout -->
+          <div class="flex items-center gap-space-sm p-3 rounded-xl bg-surface-container-low border-[1.5px] border-primary">
+            <span class="material-symbols-outlined text-[20px] text-on-surface">shield</span>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">
+              Output guaranteed deterministic: cryptographic hash <code class="px-1 py-0.5 rounded bg-surface-container-highest font-mono text-[11px] text-primary" id="hashDisplay">#sha256-8ff49e0c</code> verified by SecuScribe Integrity Layer.
+            </p>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Live Feed Card Preview -->
+        <div class="flex flex-col gap-space-md">
+          <!-- Column Header -->
+          <div class="flex items-center justify-between px-1">
+            <div class="flex items-center gap-space-xs">
+              <span class="material-symbols-outlined text-primary text-[20px]">preview</span>
+              <h2 class="font-title-md text-title-md text-primary font-bold">Live Post Preview</h2>
+            </div>
+            <div class="inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-tertiary-fixed border-[1.5px] border-primary shadow-[2px_2px_0px_#000000]">
+              <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+              <span class="font-label-sm text-label-sm uppercase text-on-tertiary-fixed font-bold tracking-tight">● Live Parity Render</span>
+            </div>
+          </div>
+
+          <!-- Feed Card Mockup Container -->
+          <article class="flex flex-col bg-surface-container-lowest rounded-xl border-[1.5px] border-primary shadow-[4px_4px_0px_#1c1b20] p-space-lg transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#1c1b20]">
+            <!-- Card Header: User avatar, handle, verified badge, 3-dot overflow -->
+            <div class="flex items-start justify-between gap-space-md pb-space-md border-b-[1.5px] border-primary/20">
+              <div class="flex items-center gap-space-md">
+                <!-- Avatar with SS emblem -->
+                <div class="relative w-12 h-12 rounded-xl bg-primary text-on-primary flex items-center justify-center border-[1.5px] border-primary shadow-[2px_2px_0px_#c8f250]">
+                  <span class="font-headline-sm text-headline-sm font-extrabold tracking-tighter text-on-primary">SS</span>
+                  <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-tertiary-fixed border-[1.5px] border-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[10px] text-primary" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                  </span>
+                </div>
+                <!-- Profile Identifiers -->
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-1">
+                    <span class="font-title-md text-title-md text-primary font-bold">SecuScribe Dispatch</span>
+                    <span class="material-symbols-outlined text-[18px] text-secondary" style="font-variation-settings: 'FILL' 1;" title="Verified Enterprise Channel">verified</span>
+                  </div>
+                  <span class="font-body-sm text-body-sm text-on-surface-variant">@secuscribe • Enterprise Workflows • Just now</span>
+                </div>
+              </div>
+              <button aria-label="Post actions" class="p-1.5 rounded-lg border-[1.5px] border-transparent hover:border-primary hover:bg-surface-container-low transition-all text-on-surface" type="button">
+                <span class="material-symbols-outlined text-[20px]">more_horiz</span>
+              </button>
+            </div>
+
+            <!-- Card Body Content -->
+            <div class="flex flex-col gap-space-md pt-space-md text-on-surface">
+              <!-- Post Headline -->
+              <h3 class="font-headline-sm text-headline-sm text-primary font-bold leading-snug" id="previewHeadline">
+                Accelerating Operational Velocity with Deterministic Intelligence
+              </h3>
+              <!-- Post Lead Paragraph -->
+              <p class="font-body-md text-body-md text-on-surface leading-[24px]" id="previewLead">
+                The Q3 operational benchmark reveals a critical shift: resource allocation is moving away from ad-hoc asynchronous workflows toward deterministic pipelines. Teams executing with unified orchestration reported a <strong class="font-bold text-primary underline decoration-tertiary-fixed decoration-4">34% speed gain</strong> across multi-vector operations.
+              </p>
+              <!-- Key Takeaways Highlight Box -->
+              <div class="p-space-md rounded-xl bg-tertiary-fixed border-[1.5px] border-primary shadow-[2px_2px_0px_#000000] flex flex-col gap-space-xs" id="previewTakeawaysBox">
+                <div class="flex items-center justify-between pb-1">
+                  <span class="font-label-sm text-label-sm uppercase text-on-tertiary-fixed font-extrabold tracking-wide">Key Operational Takeaways</span>
+                  <span class="material-symbols-outlined text-[16px] text-on-tertiary-fixed">insights</span>
+                </div>
+                <ul class="flex flex-col gap-2 font-body-sm text-body-sm text-on-tertiary-fixed" id="previewTakeawaysList">
+                  <li class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></span>
+                    <span>Complete entity parity maintained across all outputs</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></span>
+                    <span>Zero hallucination drift on mission-critical assets</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0"></span>
+                    <span>Rapid 6-channel parallel synthesis in &lt;90 seconds</span>
+                  </li>
+                </ul>
+              </div>
+              <!-- Secondary Lavender Pill Annotation -->
+              <div class="inline-flex items-center gap-space-xs px-3 py-1.5 rounded-lg bg-secondary-container border-[1.5px] border-primary w-fit">
+                <span class="material-symbols-outlined text-[16px] text-on-secondary-container">sync_saved_locally</span>
+                <span class="font-label-sm text-label-sm text-on-secondary-container font-semibold" id="previewStatusBadge">Deterministic Benchmark Q3 Verified</span>
+              </div>
+              <!-- Hashtags Bar -->
+              <div class="flex flex-wrap items-center gap-space-xs pt-1" id="previewHashtags">
+                <span class="px-2.5 py-1 rounded-full bg-surface-container-low border-[1.5px] border-primary text-secondary font-label-sm text-label-sm font-bold hover:bg-secondary-container hover:text-on-surface transition-colors cursor-pointer">#TechInsights</span>
+                <span class="px-2.5 py-1 rounded-full bg-surface-container-low border-[1.5px] border-primary text-secondary font-label-sm text-label-sm font-bold hover:bg-secondary-container hover:text-on-surface transition-colors cursor-pointer">#Automation</span>
+                <span class="px-2.5 py-1 rounded-full bg-surface-container-low border-[1.5px] border-primary text-secondary font-label-sm text-label-sm font-bold hover:bg-secondary-container hover:text-on-surface transition-colors cursor-pointer">#AIArchitecture</span>
+                <span class="px-2.5 py-1 rounded-full bg-surface-container-low border-[1.5px] border-primary text-secondary font-label-sm text-label-sm font-bold hover:bg-secondary-container hover:text-on-surface transition-colors cursor-pointer">#EnterpriseOps</span>
+              </div>
+            </div>
+
+            <!-- Engagement & Metrics Strip -->
+            <div class="mt-space-lg pt-space-sm border-t-[1.5px] border-primary/20 flex flex-col gap-space-sm">
+              <div class="flex items-center justify-between font-body-sm text-body-sm text-on-surface-variant px-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="inline-flex -space-x-1">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary text-[10px] text-on-primary">👍</span>
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-error text-[10px] text-on-error">❤️</span>
+                  </span>
+                  <span class="font-label-sm text-label-sm text-on-surface font-semibold" id="likesCounter">142 Likes</span>
+                </div>
+                <div class="flex items-center gap-space-sm font-body-sm text-body-sm text-on-surface-variant">
+                  <span>18 Comments</span>
+                  <span>•</span>
+                  <span>9 Reposts</span>
+                </div>
+              </div>
+              <div class="grid grid-cols-4 gap-space-xs pt-space-xs border-t-[1.5px] border-primary/10">
+                <button class="inline-flex items-center justify-center gap-1 py-2 px-1 rounded-lg hover:bg-surface-container-low transition-colors text-on-surface font-label-md text-label-md" type="button" onclick="likePost()">
+                  <span class="material-symbols-outlined text-[18px]">thumb_up</span>
+                  <span>Like</span>
+                </button>
+                <button class="inline-flex items-center justify-center gap-1 py-2 px-1 rounded-lg hover:bg-surface-container-low transition-colors text-on-surface font-label-md text-label-md" type="button">
+                  <span class="material-symbols-outlined text-[18px]">mode_comment</span>
+                  <span>Comment</span>
+                </button>
+                <button class="inline-flex items-center justify-center gap-1 py-2 px-1 rounded-lg hover:bg-surface-container-low transition-colors text-on-surface font-label-md text-label-md" type="button">
+                  <span class="material-symbols-outlined text-[18px]">repeat</span>
+                  <span>Repost</span>
+                </button>
+                <button class="inline-flex items-center justify-center gap-1 py-2 px-1 rounded-lg hover:bg-surface-container-low transition-colors text-on-surface font-label-md text-label-md" type="button">
+                  <span class="material-symbols-outlined text-[18px]">send</span>
+                  <span>Send</span>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Mini Live Inspector Card -->
+          <div class="flex items-center justify-between p-space-md rounded-xl bg-surface-container-low border-[1.5px] border-primary shadow-[2px_2px_0px_#17161B]">
+            <div class="flex items-center gap-space-sm">
+              <div class="w-8 h-8 rounded-full bg-secondary-container border-[1.5px] border-primary flex items-center justify-center">
+                <span class="material-symbols-outlined text-[18px] text-on-surface">hub</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="font-label-md text-label-md text-primary font-bold">Channel Ready</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant" id="charLengthText">Post length: 588 characters • LinkedIn Optimized</span>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-surface-container-lowest border-[1.5px] border-primary font-label-sm text-label-sm text-primary uppercase font-bold">100% Score</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full border-t-[1.5px] border-primary bg-surface-container-low py-space-md">
+    <div class="w-full px-gutter flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm">
+      <span class="font-label-md text-label-md text-primary font-bold tracking-tight uppercase">SECUSCRIBE OS v4.2</span>
+      <div class="flex items-center gap-space-lg">
+        <span class="font-body-sm text-body-sm text-on-surface-variant">Active Workspace: Intelligence Core</span>
+        <span class="font-body-sm text-body-sm text-on-surface-variant">© 2026 SecuScribe Inc. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = window.location.origin.startsWith('http') && !window.location.origin.includes('5500')
+      ? ''
+      : 'http://localhost:8000';
+
+    const textarea = document.getElementById('postSourceInput');
+    const copyBtn = document.getElementById('btnCopyText');
+    const copyBtnText = document.getElementById('copyBtnText');
+    const downloadBtn = document.getElementById('btnDownloadTxt');
+    const badge = document.getElementById('charCountBadge');
+    const lengthText = document.getElementById('charLengthText');
+
+    // Dynamic filename in header
+    const fileName = sessionStorage.getItem('secuscribe_file_name') || 'Q3_Strategic_Brief.pdf';
+    document.getElementById('navFileName').textContent = fileName;
+
+    // Load real results from sessionStorage
+    const resultsStr = sessionStorage.getItem('secuscribe_results');
+    if (resultsStr) {
+      try {
+        const results = JSON.parse(resultsStr);
+        if (results.sha256_hash) {
+          document.getElementById('hashDisplay').textContent = `#sha256-${results.sha256_hash.substring(0, 8)}`;
+        }
+
+        // Check if real social posts exist in response
+        if (results.social_posts) {
+          const sp = results.social_posts;
+          let content = '';
+          if (typeof sp === 'string') content = sp;
+          else if (sp.linkedin_post) content = sp.linkedin_post;
+          else if (sp.x_thread) content = Array.isArray(sp.x_thread) ? sp.x_thread.join('\n\n') : sp.x_thread;
+          else if (sp.posts) content = JSON.stringify(sp.posts, null, 2);
+
+          if (content) {
+            textarea.value = content;
+          }
+        } else if (results.canonical_facts && results.canonical_facts.summary) {
+          const facts = results.canonical_facts;
+          textarea.value = `${facts.title || 'Threat Advisory Alert'}\n\n${facts.summary}\n\nKey Takeaways:\n` +
+            (facts.recommended_actions || []).map(a => `• ${a}`).join('\n') +
+            `\n\n#CyberSecurity #ThreatIntel #SecuScribe #${facts.severity || 'Advisory'}`;
+        }
+      } catch (e) {
+        console.warn('Could not parse stored results', e);
+      }
+    }
+
+    function updateStatsAndPreview() {
+      if (!textarea) return;
+      const text = textarea.value.trim();
+      const words = text ? text.split(/\s+/).length : 0;
+      const chars = text.length;
+
+      if (badge) badge.textContent = `${words} words • Markdown Mode`;
+      if (lengthText) lengthText.textContent = `Post length: ${chars} characters • LinkedIn Optimized`;
+
+      // Live update preview headline and lead
+      const lines = text.split('\n').filter(l => l.trim().length > 0);
+      if (lines.length > 0) {
+        const headlineEl = document.getElementById('previewHeadline');
+        if (headlineEl) headlineEl.textContent = lines[0].replace(/^#+\s*/, '');
+      }
+      if (lines.length > 1) {
+        const leadEl = document.getElementById('previewLead');
+        if (leadEl) leadEl.textContent = lines[1];
+      }
+    }
+
+    textarea.addEventListener('input', updateStatsAndPreview);
+    updateStatsAndPreview();
+
+    function formatSelection(wrapper) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      if (start === end) return;
+      textarea.value = text.substring(0, start) + wrapper + text.substring(start, end) + wrapper + text.substring(end);
+      updateStatsAndPreview();
+    }
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(textarea.value);
+        const original = copyBtnText.textContent;
+        copyBtnText.textContent = 'Copied to Clipboard!';
+        copyBtn.classList.add('bg-tertiary-fixed', 'text-primary');
+        copyBtn.classList.remove('bg-primary', 'text-on-primary');
+        setTimeout(() => {
+          copyBtnText.textContent = original;
+          copyBtn.classList.remove('bg-tertiary-fixed', 'text-primary');
+          copyBtn.classList.add('bg-primary', 'text-on-primary');
+        }, 2000);
+      } catch (err) {
+        console.error('Clipboard copy failed', err);
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const content = textarea.value;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `SecuScribe_${fileName.replace(/\.[^/.]+$/, "")}_Post.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+
+    function downloadAdvisoryPdf() {
+      window.open(`${API_BASE}/api/v1/outputs/advisory_report.pdf`, '_blank');
+    }
+    function downloadPresentationPptx() {
+      window.location.href = `${API_BASE}/api/v1/outputs/presentation.pptx`;
+    }
+    function downloadInfographicSvg() {
+      window.open(`${API_BASE}/api/v1/outputs/infographic_blueprint.svg`, '_blank');
+    }
+
+    let likes = 142;
+    function likePost() {
+      likes++;
+      document.getElementById('likesCounter').textContent = `${likes} Likes`;
+    }
+  </script>
+</body>
+</html>

@@ -1,28 +1,8 @@
 import os
 import re
-import logging
 import pdfplumber
 from docx import Document
 from typing import Dict, Any
-
-logger = logging.getLogger(__name__)
-
-
-def build_fallback_canonical_facts(text: str, locked_params: Dict[str, Any]) -> Dict[str, Any]:
-    """Create a deterministic facts object when the local LLM is unavailable."""
-    source = (text or "").strip()
-    sentences = re.split(r"(?<=[.!?])\s+", source)
-    summary = " ".join(sentences[:2]).strip() or "No readable text could be extracted from the source document."
-    severities = locked_params.get("locked_severities", [])
-    return {
-        "title": "Security Advisory Briefing",
-        "severity": severities[0] if severities else "UNKNOWN",
-        "cve_ids": list(locked_params.get("locked_cves", [])),
-        "affected_systems": [],
-        "summary": summary[:1000],
-        "recommended_actions": ["Review the source document and confirm appropriate mitigation actions."],
-        "locked_ips": list(locked_params.get("locked_ips", [])),
-    }
 
 def extract_raw_text(file_path: str) -> str:
     """

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="web_standard" name="shell-type"/>
+  <title>SecuScribe | Video Script &amp; Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-primary-fixed-variant": "#48464c",
+            "on-surface": "#1a1c1d",
+            "tertiary-fixed": "#c8f250",
+            "surface-container-low": "#f3f3f5",
+            "on-tertiary-container": "#708f00",
+            "on-secondary-fixed": "#181932",
+            "error": "#ba1a1a",
+            "secondary-fixed-dim": "#c4c4e5",
+            "on-primary-container": "#858389",
+            "on-error-container": "#93000a",
+            "inverse-surface": "#2f3132",
+            "on-primary-fixed": "#1c1b20",
+            "on-surface-variant": "#48464b",
+            "surface": "#f9f9fb",
+            "surface-container": "#eeeef0",
+            "on-tertiary-fixed": "#161f00",
+            "tertiary-fixed-dim": "#add534",
+            "primary-container": "#1c1b20",
+            "tertiary-container": "#161f00",
+            "surface-container-lowest": "#ffffff",
+            "surface-bright": "#f9f9fb",
+            "tertiary": "#000000",
+            "surface-container-high": "#e8e8ea",
+            "on-tertiary": "#ffffff",
+            "outline-variant": "#c9c5cb",
+            "on-secondary": "#ffffff",
+            "on-primary": "#ffffff",
+            "secondary-fixed": "#e1e0ff",
+            "surface-dim": "#d9dadc",
+            "background": "#f9f9fb",
+            "on-background": "#1a1c1d",
+            "surface-container-highest": "#e2e2e4",
+            "on-secondary-container": "#60607d",
+            "secondary-container": "#deddff",
+            "inverse-on-surface": "#f0f0f2",
+            "on-secondary-fixed-variant": "#444460",
+            "outline": "#79767b",
+            "primary-fixed-dim": "#c9c5cc",
+            "inverse-primary": "#c9c5cc",
+            "on-error": "#ffffff",
+            "surface-tint": "#605d63",
+            "secondary": "#5b5c79",
+            "error-container": "#ffdad6",
+            "on-tertiary-fixed-variant": "#3b4d00",
+            "surface-variant": "#e2e2e4",
+            "primary": "#000000",
+            "primary-fixed": "#e5e1e8"
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px"
+          },
+          spacing: {
+            gutter: "1.5rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem",
+            "space-xl": "2.5rem",
+            "space-sm": "0.5rem",
+            "gutter-sm": "1rem",
+            margin: "2rem",
+            "space-lg": "1.5rem",
+            "margin-sm": "1rem"
+          },
+          fontFamily: {
+            "body-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "title-md": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "headline-xl-mobile": ["Plus Jakarta Sans"]
+          },
+          fontSize: {
+            "body-lg": ["16px", { lineHeight: "26px", letterSpacing: "0em", fontWeight: "400" }],
+            "body-sm": ["12px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "400" }],
+            "headline-md": ["24px", { lineHeight: "32px", letterSpacing: "-0.015em", fontWeight: "700" }],
+            "headline-lg-mobile": ["26px", { lineHeight: "34px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.03em", fontWeight: "700" }],
+            "headline-sm": ["20px", { lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "600" }],
+            "headline-xl": ["48px", { lineHeight: "56px", letterSpacing: "-0.03em", fontWeight: "800" }],
+            "headline-lg": ["36px", { lineHeight: "44px", letterSpacing: "-0.025em", fontWeight: "700" }],
+            "title-md": ["16px", { lineHeight: "24px", letterSpacing: "-0.005em", fontWeight: "600" }],
+            "body-md": ["14px", { lineHeight: "22px", letterSpacing: "0em", fontWeight: "400" }],
+            "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.02em", fontWeight: "700" }],
+            "label-sm": ["10px", { lineHeight: "14px", letterSpacing: "0.05em", fontWeight: "800" }],
+            "headline-xl-mobile": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "800" }]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface-container-lowest font-body-md text-on-surface antialiased">
+  <!-- TOP HEADER -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b-[1.5px] border-primary">
+    <div class="h-28 max-w-[1280px] mx-auto px-gutter flex flex-col justify-between pt-3 pb-0">
+      <div class="flex items-center justify-between gap-space-md">
+        <div class="flex items-center gap-space-md">
+          <span class="font-headline-sm text-headline-sm uppercase tracking-tight text-primary font-extrabold">SECUSCRIBE</span>
+          <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 bg-surface-container-high border-[1.5px] border-primary rounded-full font-label-sm text-label-sm text-on-surface uppercase font-bold">
+            <span class="material-symbols-outlined text-[14px]">description</span>
+            <span id="navDocName">Q3_Strategic_Brief.pdf</span>
+          </span>
+        </div>
+        <div class="flex items-center gap-space-md">
+          <a class="inline-flex items-center px-4 py-1.5 bg-surface-container-lowest text-on-surface border-[1.5px] border-primary rounded-full font-label-md text-label-md shadow-[4px_4px_0px_#1c1b20] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#1c1b20] active:translate-x-[4px] active:translate-y-[4px] active:shadow-[0px_0px_0px_#1c1b20] transition-all font-bold" href="03_processing.html">
+            ← Back to All Deliverables
+          </a>
+          <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center border-[1.5px] border-primary shadow-[2px_2px_0px_#1c1b20]">
+            <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+          </div>
+        </div>
+      </div>
+      <!-- TABS -->
+      <nav class="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none">
+        <a class="px-3.5 py-1.5 rounded-full border-[1.5px] border-primary text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-container hover:text-on-surface transition-all font-bold" href="04_social_media.html">LinkedIn &amp; X</a>
+        <a class="px-3.5 py-1.5 rounded-full border-[1.5px] border-primary bg-secondary-fixed text-on-secondary-fixed font-bold font-label-md text-label-md whitespace-nowrap shadow-[2px_2px_0px_#1c1b20] transition-all" href="05_video.html">Video Script &amp; Preview</a>
+        <a class="px-3.5 py-1.5 rounded-full border-[1.5px] border-primary text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-container hover:text-on-surface transition-all font-bold" href="javascript:void(0)" onclick="downloadAdvisoryPdf()">Official Advisory</a>
+        <a class="px-3.5 py-1.5 rounded-full border-[1.5px] border-primary text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-container hover:text-on-surface transition-all font-bold" href="06_summary.html">Executive Summary</a>
+        <a class="px-3.5 py-1.5 rounded-full border-[1.5px] border-primary text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-container hover:text-on-surface transition-all font-bold" href="javascript:void(0)" onclick="downloadPresentationPptx()">Slide Deck</a>
+        <a class="px-3.5 py-1.5 rounded-full border-[1.5px] border-primary text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-container hover:text-on-surface transition-all font-bold" href="javascript:void(0)" onclick="downloadInfographicSvg()">Data Summary Table</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="w-full pt-28 max-w-[1280px] mx-auto px-gutter min-h-[calc(100vh-4rem)] bg-surface-container-lowest">
+    <div class="flex flex-col w-full pb-16">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg mt-6 pb-12 items-stretch">
+        <!-- LEFT COLUMN: Scene-Wise Script Card -->
+        <div class="lg:col-span-6 flex flex-col h-full">
+          <div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-[12px] p-space-md sm:p-space-lg shadow-[3px_3px_0px_#1c1b20] flex flex-col justify-between h-full">
+            <div class="flex flex-col gap-4">
+              <!-- Card Header -->
+              <div class="flex items-center justify-between pb-3 border-b-[1.5px] border-surface-container-high">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-primary inline-block"></span>
+                  <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Scene Narrative &amp; Script</h2>
+                </div>
+                <span class="px-3 py-1 bg-surface-container border-[1.5px] border-primary rounded-full font-label-sm text-label-sm text-on-surface font-bold" id="sceneCountBadge">
+                  3 Scenes • 00:40 Runtime
+                </span>
+              </div>
+
+              <!-- Container for scene cards -->
+              <div class="flex flex-col gap-3.5" id="scenesContainer">
+                <!-- Scene 01 -->
+                <div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-[8px] p-3.5 shadow-[2px_2px_0px_#1c1b20] flex flex-col gap-2.5">
+                  <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-0.5 bg-primary text-on-primary rounded-full font-label-sm text-label-sm font-bold">SCENE 01</span>
+                    <span class="font-mono font-bold text-label-sm text-on-surface-variant">00:00 — 00:10</span>
+                  </div>
+                  <div class="flex items-center gap-2 bg-surface-container-low border border-primary/20 rounded px-2.5 py-1.5 text-on-surface-variant font-label-sm text-label-sm">
+                    <span class="material-symbols-outlined text-[16px] text-primary">smart_display</span>
+                    <span>Visual Cue: Executive threat metrics overview and advisory header.</span>
+                  </div>
+                  <div class="p-2.5 bg-surface-container-lowest border border-primary/20 rounded">
+                    <p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                      “Security incident advisory briefing highlights confirmed telemetry across core infrastructure.”
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Scene 02 (Key Highlight) -->
+                <div class="bg-surface-container-lowest border-[2px] border-primary rounded-[8px] p-3.5 shadow-[3px_3px_0px_#1c1b20] flex flex-col gap-2.5 relative overflow-hidden">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="px-2.5 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed border border-primary rounded-full font-label-sm text-label-sm font-bold">SCENE 02 • CORE</span>
+                      <span class="font-mono font-bold text-label-sm text-on-surface-variant">00:10 — 00:25</span>
+                    </div>
+                    <span class="px-2 py-0.5 bg-tertiary-fixed/30 border border-primary text-on-tertiary-fixed font-label-sm text-label-sm font-bold rounded-full">Key Takeaway</span>
+                  </div>
+                  <div class="flex items-center gap-2 bg-tertiary-fixed/20 border border-primary/30 rounded px-2.5 py-1.5 text-on-surface font-label-sm text-label-sm">
+                    <span class="material-symbols-outlined text-[16px] text-primary">monitoring</span>
+                    <span>Visual Cue: Deterministic vulnerability remediation pipeline animation.</span>
+                  </div>
+                  <div class="p-2.5 bg-tertiary-fixed/10 border-[1.5px] border-primary rounded">
+                    <p class="font-body-md text-body-md text-on-surface font-medium leading-relaxed">
+                      “Automated mitigation controls and network isolation successfully enacted with 100% verified entity parity.”
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Scene 03 -->
+                <div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-[8px] p-3.5 shadow-[2px_2px_0px_#1c1b20] flex flex-col gap-2.5">
+                  <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-0.5 bg-primary text-on-primary rounded-full font-label-sm text-label-sm font-bold">SCENE 03</span>
+                    <span class="font-mono font-bold text-label-sm text-on-surface-variant">00:25 — 00:40</span>
+                  </div>
+                  <div class="flex items-center gap-2 bg-surface-container-low border border-primary/20 rounded px-2.5 py-1.5 text-on-surface-variant font-label-sm text-label-sm">
+                    <span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
+                    <span>Visual Cue: Mandatory compliance checklist and SOC sign-off.</span>
+                  </div>
+                  <div class="p-2.5 bg-surface-container-lowest border border-primary/20 rounded">
+                    <p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                      “Immediate patch rollout mandated across all cluster endpoints under weekly audit oversight.”
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pinned Bottom Action -->
+            <div class="pt-4 mt-4 border-t-[1.5px] border-surface-container-high">
+              <button class="w-full inline-flex items-center justify-center gap-2 py-3 px-4 bg-surface-container-lowest text-on-surface border-[1.5px] border-primary rounded-full font-label-md text-label-md shadow-[3px_3px_0px_#1c1b20] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#1c1b20] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[0px_0px_0px_#1c1b20] transition-all font-bold" id="copy-script-btn" onclick="copyFullScript()">
+                <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                <span id="copyScriptText">📋 Copy Full Script</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Video Player & Expanded Export Dock -->
+        <div class="lg:col-span-6 flex flex-col h-full">
+          <div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-[12px] p-space-md sm:p-space-lg shadow-[3px_3px_0px_#1c1b20] flex flex-col justify-between h-full">
+            <div class="flex flex-col gap-4">
+              <!-- Card Header -->
+              <div class="flex items-center justify-between pb-3 border-b-[1.5px] border-surface-container-high">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-tertiary-fixed-dim border border-primary inline-block"></span>
+                  <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Rendered Video Preview</h2>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-tertiary-fixed border-[1.5px] border-primary rounded-full font-label-sm text-label-sm text-on-tertiary-fixed font-bold shadow-[2px_2px_0px_#1c1b20]">
+                  <span class="w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse inline-block"></span>● 1080p HD Ready
+                </span>
+              </div>
+
+              <!-- 16:9 Video Canvas -->
+              <div class="relative w-full aspect-video rounded-[8px] bg-primary border-[1.5px] border-primary overflow-hidden flex flex-col justify-between p-4 group select-none shadow-inner" id="videoCanvas">
+                <div class="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(#DAD9FB_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <!-- Top Badges Overlay -->
+                <div class="relative z-10 flex items-center justify-between w-full">
+                  <span class="px-2.5 py-0.5 bg-surface-container-lowest text-on-surface border-[1.5px] border-primary rounded-full font-label-sm text-label-sm font-bold shadow-[2px_2px_0px_#DAD9FB]">REC PREVIEW</span>
+                  <span class="px-2.5 py-0.5 bg-primary-container text-on-primary border border-surface-container-high rounded font-label-sm text-label-sm tracking-wider font-mono">1080P HD • 16:9</span>
+                </div>
+                <!-- Center Graphic Overlay -->
+                <div class="relative z-10 flex flex-col items-center justify-center text-center my-auto px-4">
+                  <button class="w-16 h-16 rounded-full bg-surface-container-lowest border-[2px] border-primary text-primary flex items-center justify-center shadow-[4px_4px_0px_#D2FC59] hover:scale-105 active:scale-95 transition-all mb-3 cursor-pointer" id="main-play-button" onclick="togglePlayback()">
+                    <span class="material-symbols-outlined text-[36px] ml-1 play-icon" id="playIcon">play_arrow</span>
+                  </button>
+                  <div class="bg-surface-container-lowest/10 backdrop-blur-sm border border-surface-container-high/20 px-4 py-1.5 rounded-lg">
+                    <p class="font-label-lg text-label-lg text-surface-container-lowest uppercase tracking-wider font-bold" id="videoOverlayTitle">SECUSCRIBE OPERATIONAL REPORT</p>
+                    <p class="font-label-sm text-label-sm text-tertiary-fixed font-bold tracking-widest mt-0.5" id="videoOverlaySub">+34% VELOCITY GAIN ACHIEVED</p>
+                  </div>
+                </div>
+                <!-- Lower-Third Subtitle Bar -->
+                <div class="relative z-10 flex justify-center w-full">
+                  <div class="inline-flex items-center gap-2 bg-primary/90 border-[1.5px] border-tertiary-fixed px-3 py-1 rounded-full shadow-[2px_2px_0px_#000000]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed inline-block"></span>
+                    <span class="font-body-sm text-body-sm text-surface-container-lowest font-medium" id="lowerThirdSubtitle">Key takeaway: 100% entity parity locked across pipelines.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Video Controls Timeline -->
+              <div class="flex flex-col gap-2">
+                <div class="relative w-full h-2.5 bg-surface-container-high rounded-full border-[1.5px] border-primary cursor-pointer overflow-hidden flex items-center" id="timelineBar" onclick="seekTimeline(event)">
+                  <div class="h-full bg-tertiary-fixed border-r-[1.5px] border-primary relative transition-all duration-200" id="progressIndicator" style="width: 100%;">
+                    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-primary rounded-full"></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <button class="w-7 h-7 rounded-full border-[1.5px] border-primary bg-surface-container-lowest flex items-center justify-center hover:bg-surface-container transition-colors cursor-pointer" onclick="togglePlayback()">
+                      <span class="material-symbols-outlined text-[16px] text-primary" id="miniPlayIcon">play_arrow</span>
+                    </button>
+                    <span class="font-mono text-label-sm text-label-sm font-bold text-on-surface" id="timeDisplay">00:40 / 00:40</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px] text-on-surface cursor-pointer">volume_up</span>
+                    <button class="w-7 h-7 rounded-full border-[1.5px] border-primary bg-surface-container-lowest flex items-center justify-center hover:bg-surface-container transition-colors cursor-pointer" onclick="toggleFullScreen()">
+                      <span class="material-symbols-outlined text-[16px] text-primary">fullscreen</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons Panel -->
+              <div class="flex flex-col gap-2.5">
+                <a class="w-full inline-flex items-center justify-center gap-2.5 py-3 px-6 bg-primary text-on-primary border-[1.5px] border-primary rounded-full font-label-lg text-label-lg shadow-[4px_4px_0px_#D2FC59] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#D2FC59] active:translate-x-[3px] active:translate-y-[3px] active:shadow-[0px_0px_0px_#D2FC59] transition-all font-bold cursor-pointer" id="btnDownloadMp4" onclick="downloadMasterVideo()">
+                  <span class="material-symbols-outlined text-[20px]">download</span>
+                  <span>⬇ Download Master Video (.MP4)</span>
+                </a>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <a class="inline-flex items-center justify-center gap-2 py-2 px-3 bg-surface-container-lowest text-on-surface border-[1.5px] border-primary rounded-full font-label-md text-label-md shadow-[2px_2px_0px_#1c1b20] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_#1c1b20] transition-all font-bold cursor-pointer" onclick="downloadAudioMp3()">
+                    <span class="material-symbols-outlined text-[16px]">headphones</span>
+                    <span>🎧 Download Audio (.MP3)</span>
+                  </a>
+                  <a class="inline-flex items-center justify-center gap-2 py-2 px-3 bg-surface-container-lowest text-on-surface border-[1.5px] border-primary rounded-full font-label-md text-label-md shadow-[2px_2px_0px_#1c1b20] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_#1c1b20] transition-all font-bold cursor-pointer" onclick="downloadSubtitlesSrt()">
+                    <span class="material-symbols-outlined text-[16px]">description</span>
+                    <span>📄 Download Subtitles (.SRT)</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Anchored Bottom Assurance Tag -->
+            <div class="pt-3 mt-4 border-t-[1.5px] border-surface-container-high">
+              <div class="flex items-center justify-center gap-2 p-2.5 bg-tertiary-fixed border-[1.5px] border-primary rounded-full shadow-[2px_2px_0px_#1c1b20]">
+                <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+                <span class="font-label-sm text-label-sm text-on-tertiary-fixed font-bold uppercase tracking-wider">
+                  ✓ 100% Fact Parity Locked • High-Definition AI Voiceover Synced
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full bg-surface-container-lowest border-t-[1.5px] border-primary py-space-md">
+    <div class="max-w-[1280px] mx-auto px-gutter flex flex-col sm:flex-row items-center justify-between gap-space-sm">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-tertiary-fixed border border-primary inline-block"></span>
+        <span class="font-label-sm text-label-sm text-on-surface uppercase tracking-wide font-bold">● System Active</span>
+      </div>
+      <span class="font-label-sm text-label-sm text-on-surface-variant">© 2026 SecuScribe Inc. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = window.location.origin.startsWith('http') && !window.location.origin.includes('5500')
+      ? ''
+      : 'http://localhost:8000';
+
+    const fileName = sessionStorage.getItem('secuscribe_file_name') || 'Q3_Strategic_Brief.pdf';
+    document.getElementById('navDocName').textContent = fileName;
+
+    let isPlaying = false;
+    let playbackInterval = null;
+    let currentSeconds = 40;
+    const totalSeconds = 40;
+
+    // Load video blueprint from results if available
+    const resultsStr = sessionStorage.getItem('secuscribe_results');
+    let videoBlueprint = null;
+
+    if (resultsStr) {
+      try {
+        const results = JSON.parse(resultsStr);
+        if (results.video_package) {
+          videoBlueprint = results.video_package;
+          renderVideoScenes(videoBlueprint);
+        } else if (results.canonical_facts) {
+          renderGeneratedScenesFromFacts(results.canonical_facts);
+        }
+      } catch (e) {
+        console.warn('Error reading stored video package', e);
+      }
+    }
+
+    function renderVideoScenes(bp) {
+      if (!bp || !bp.scenes || !bp.scenes.length) return;
+      const container = document.getElementById('scenesContainer');
+      container.innerHTML = '';
+
+      let elapsed = 0;
+      bp.scenes.forEach((sc, idx) => {
+        const dur = sc.duration_seconds || 12;
+        const startStr = formatTime(elapsed);
+        elapsed += dur;
+        const endStr = formatTime(elapsed);
+
+        const isCore = idx === 1 || sc.intent === 'metrics';
+        const card = document.createElement('div');
+        card.className = `bg-surface-container-lowest border-[${isCore ? '2px' : '1.5px'}] border-primary rounded-[8px] p-3.5 shadow-[${isCore ? '3px_3px_0px_#1c1b20' : '2px_2px_0px_#1c1b20'}] flex flex-col gap-2.5`;
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="px-2.5 py-0.5 ${isCore ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 'bg-primary text-on-primary'} rounded-full font-label-sm text-label-sm font-bold">SCENE 0${sc.scene_number || (idx + 1)}${isCore ? ' • CORE' : ''}</span>
+            <span class="font-mono font-bold text-label-sm text-on-surface-variant">${startStr} — ${endStr}</span>
+          </div>
+          <div class="flex items-center gap-2 bg-surface-container-low border border-primary/20 rounded px-2.5 py-1.5 text-on-surface-variant font-label-sm text-label-sm">
+            <span class="material-symbols-outlined text-[16px] text-primary">smart_display</span>
+            <span>Visual Cue: ${sc.visual_description || sc.on_screen_text || 'Key takeaway visual graph'}</span>
+          </div>
+          <div class="p-2.5 bg-surface-container-lowest border border-primary/20 rounded">
+            <p class="font-body-md text-body-md text-on-surface leading-relaxed">“${sc.narration || ''}”</p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      document.getElementById('sceneCountBadge').textContent = `${bp.scenes.length} Scenes • ${formatTime(elapsed)} Runtime`;
+      if (bp.title) {
+        document.getElementById('videoOverlayTitle').textContent = bp.title.toUpperCase();
+      }
+    }
+
+    function renderGeneratedScenesFromFacts(facts) {
+      if (facts.title) {
+        document.getElementById('videoOverlayTitle').textContent = facts.title.toUpperCase();
+      }
+      if (facts.severity) {
+        document.getElementById('videoOverlaySub').textContent = `SEVERITY: ${facts.severity} • VERIFIED PARITY`;
+      }
+    }
+
+    function formatTime(s) {
+      const mins = Math.floor(s / 60);
+      const secs = s % 60;
+      return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function togglePlayback() {
+      const playIcon = document.getElementById('playIcon');
+      const miniPlayIcon = document.getElementById('miniPlayIcon');
+      isPlaying = !isPlaying;
+
+      if (isPlaying) {
+        playIcon.textContent = 'pause';
+        miniPlayIcon.textContent = 'pause';
+        currentSeconds = 0;
+        playbackInterval = setInterval(() => {
+          currentSeconds++;
+          if (currentSeconds > totalSeconds) {
+            currentSeconds = totalSeconds;
+            togglePlayback();
+            return;
+          }
+          const pct = (currentSeconds / totalSeconds) * 100;
+          document.getElementById('progressIndicator').style.width = `${pct}%`;
+          document.getElementById('timeDisplay').textContent = `${formatTime(currentSeconds)} / ${formatTime(totalSeconds)}`;
+        }, 1000);
+      } else {
+        playIcon.textContent = 'play_arrow';
+        miniPlayIcon.textContent = 'play_arrow';
+        clearInterval(playbackInterval);
+      }
+    }
+
+    function seekTimeline(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const pct = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
+      document.getElementById('progressIndicator').style.width = `${pct}%`;
+      currentSeconds = Math.round((pct / 100) * totalSeconds);
+      document.getElementById('timeDisplay').textContent = `${formatTime(currentSeconds)} / ${formatTime(totalSeconds)}`;
+    }
+
+    function toggleFullScreen() {
+      const el = document.getElementById('videoCanvas');
+      if (el.requestFullscreen) el.requestFullscreen();
+    }
+
+    function copyFullScript() {
+      const narrations = [];
+      document.querySelectorAll('#scenesContainer p').forEach(p => {
+        narrations.push(p.textContent.replace(/[“”"]/g, '').trim());
+      });
+      const text = narrations.join('\n\n');
+      navigator.clipboard.writeText(text);
+
+      const btn = document.getElementById('copyScriptText');
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copied Full Script';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    }
+
+    function downloadMasterVideo() {
+      window.open(`${API_BASE}/api/v1/outputs/generated_advisory.mp4`, '_blank');
+    }
+
+    function downloadAudioMp3() {
+      const narrations = [];
+      document.querySelectorAll('#scenesContainer p').forEach(p => {
+        narrations.push(p.textContent.replace(/[“”"]/g, '').trim());
+      });
+      const blob = new Blob([narrations.join('\n\n')], { type: 'audio/mpeg' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `SecuScribe_Voiceover_${fileName.replace(/\.[^/.]+$/, "")}.mp3`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function downloadSubtitlesSrt() {
+      let srt = "1\n00:00:00,000 --> 00:00:10,000\nSecurity incident advisory briefing highlights confirmed telemetry.\n\n2\n00:00:10,000 --> 00:00:25,000\nAutomated mitigation controls and network isolation enacted with 100% verified entity parity.\n\n3\n00:00:25,000 --> 00:00:40,000\nImmediate patch rollout mandated across all cluster endpoints.";
+      const blob = new Blob([srt], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `SecuScribe_${fileName.replace(/\.[^/.]+$/, "")}.srt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function downloadAdvisoryPdf() {
+      window.open(`${API_BASE}/api/v1/outputs/advisory_report.pdf`, '_blank');
+    }
+    function downloadPresentationPptx() {
+      window.location.href = `${API_BASE}/api/v1/outputs/presentation.pptx`;
+    }
+    function downloadInfographicSvg() {
+      window.open(`${API_BASE}/api/v1/outputs/infographic_blueprint.svg`, '_blank');
+    }
+  </script>
+</body>
+</html>

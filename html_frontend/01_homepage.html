@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary-fixed":"#e5e1e8","on-primary-fixed":"#1c1b20","secondary":"#5b5c79","primary":"#000000","on-primary-container":"#858389","surface-tint":"#605d63","on-error-container":"#93000a","error":"#ba1a1a","surface-container":"#eeeef0","background":"#f9f9fb","tertiary-fixed-dim":"#add534","secondary-container":"#deddff","on-surface":"#1a1c1d","surface":"#f9f9fb","on-secondary":"#ffffff","on-primary":"#ffffff","primary-container":"#1c1b20","inverse-surface":"#2f3132","inverse-primary":"#c9c5cc","surface-container-low":"#f3f3f5","on-secondary-container":"#60607d","secondary-fixed-dim":"#c4c4e5","surface-container-high":"#e8e8ea","surface-variant":"#e2e2e4","on-background":"#1a1c1d","surface-container-highest":"#e2e2e4","on-primary-fixed-variant":"#48464c","on-surface-variant":"#48464b","on-secondary-fixed-variant":"#444460","tertiary":"#000000","tertiary-fixed":"#c8f250","on-tertiary-fixed":"#161f00","on-error":"#ffffff","on-secondary-fixed":"#181932","tertiary-container":"#161f00","on-tertiary":"#ffffff","surface-container-lowest":"#ffffff","outline-variant":"#c9c5cb","error-container":"#ffdad6","primary-fixed-dim":"#c9c5cc","on-tertiary-fixed-variant":"#3b4d00","on-tertiary-container":"#708f00","surface-bright":"#f9f9fb","outline":"#79767b","surface-dim":"#d9dadc","secondary-fixed":"#e1e0ff","inverse-on-surface":"#f0f0f2"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"gutter-sm":"1rem","space-lg":"1.5rem","space-xl":"2.5rem","gutter":"1.5rem","space-sm":"0.5rem","space-xs":"0.25rem","margin-sm":"1rem","margin":"2rem","space-md":"1rem"},fontFamily:{"body-md":["Inter"],"headline-sm":["Plus Jakarta Sans"],"headline-xl-mobile":["Plus Jakarta Sans"],"body-sm":["Inter"],"headline-lg":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"label-lg":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"],"title-md":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"],"headline-xl":["Plus Jakarta Sans"],"body-lg":["Inter"]},fontSize:{"body-md":["14px",{"lineHeight":"22px","letterSpacing":"0em","fontWeight":"400"}],"headline-sm":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-xl-mobile":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"800"}],"body-sm":["12px",{"lineHeight":"18px","letterSpacing":"0.01em","fontWeight":"400"}],"headline-lg":["36px",{"lineHeight":"44px","letterSpacing":"-0.025em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.03em","fontWeight":"700"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.02em","fontWeight":"700"}],"headline-md":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"700"}],"label-sm":["10px",{"lineHeight":"14px","letterSpacing":"0.05em","fontWeight":"800"}],"title-md":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"600"}],"headline-lg-mobile":["26px",{"lineHeight":"34px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-xl":["48px",{"lineHeight":"56px","letterSpacing":"-0.03em","fontWeight":"800"}],"body-lg":["16px",{"lineHeight":"26px","letterSpacing":"0em","fontWeight":"400"}]}}}}</script></head><body class="bg-surface-container-lowest font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 w-full z-50 pt-space-md px-margin-sm md:px-margin"><div class="h-20 max-w-7xl mx-auto px-gutter bg-surface-container-lowest border-[1.5px] border-[#17161B] rounded-full shadow-[4px_4px_0px_#17161B] flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center border-[1.5px] border-[#17161B] shadow-[2px_2px_0px_#17161B]"><span class="w-3 h-3 bg-tertiary-fixed rounded-sm transform rotate-45"></span></div><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface" style="font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em; color: #000000;">UnifiOps</span></div><nav class="hidden md:flex items-center gap-space-lg" data-active-classes="bg-primary text-on-primary rounded-full px-space-md py-space-xs font-label-md"><a aria-current="page" class="transition-colors bg-primary text-on-primary rounded-full px-space-md py-space-xs font-label-md" data-path="about-us" href="#about">About Us</a><a class="font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors" data-path="how-it-works" href="#how-it-works">How It Works</a><a class="font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors" data-path="deliverables" href="#deliverables">Deliverables</a><a class="font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors" data-path="contact" href="#contact">Contact</a></nav><div class="flex items-center gap-space-md"><a class="hidden sm:inline-flex items-center gap-space-xs px-space-lg py-space-sm bg-primary text-on-primary rounded-full border-[1.5px] border-[#17161B] shadow-[4px_4px_0px_#DAD9FB] hover:shadow-[6px_6px_0px_#DAD9FB] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-none transition-all font-label-lg text-label-lg" data-path="contact" href="/chat"><span>Start Chat</span><span class="material-symbols-outlined text-[18px]">arrow_forward</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center border-[1.5px] border-[#17161B]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-20 bg-surface-container-lowest max-w-7xl mx-auto px-margin-sm md:px-margin"><div class="flex flex-col w-full">
+<!-- SECTION 2: HERO SPLIT INTRODUCTION -->
+<section id="about" class="w-full pt-8 pb-16">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+<!-- Left Column: Introduction & Core Pitch (6 Cols) -->
+<div class="lg:col-span-6 flex flex-col items-start gap-6">
+<!-- Pill Badge -->
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-tertiary-fixed border-[1.5px] border-primary shadow-[2px_2px_0px_#000000]">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-tertiary-fixed font-black">✦ AI CONTENT TRANSFORMATION PLATFORM</span>
+</div>
+<!-- Headline -->
+<h1 class="font-headline-xl text-headline-xl text-primary font-extrabold tracking-tight leading-[1.08]">
+          Transforming Complex Reports Into <span class="bg-secondary-container px-2 py-0.5 rounded-lg border-[1.5px] border-primary shadow-[3px_3px_0px_#000000] inline-block">6 Multi-Channel</span> Deliverables Instantly.
+        </h1>
+<!-- Narrative Subtitle -->
+<p class="font-body-lg text-body-lg text-secondary max-w-xl">
+          UnifiOps is an AI platform designed to eliminate manual re-formatting. Upload any report or document once, and our platform instantly generates publication-ready social posts, video briefings, advisories, executive summaries, slide decks, and infographics - with zero factual errors.
+        </p>
+<!-- CTA Buttons Group -->
+<div class="flex flex-wrap items-center gap-4 pt-2 w-full sm:w-auto">
+<a class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-on-primary rounded-full font-label-lg text-label-lg font-bold border-[1.5px] border-primary shadow-[4px_4px_0px_#000000] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#000000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all" href="/chat">
+<span>Start Chat / Upload File</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</a>
+<button class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-surface-container-lowest text-primary rounded-full font-label-lg text-label-lg font-bold border-[1.5px] border-primary shadow-[4px_4px_0px_#000000] hover:bg-surface-container-low hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#000000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all" type="button">
+<span class="material-symbols-outlined text-[20px]">play_circle</span>
+<span>View Demo</span>
+</button>
+</div>
+<!-- Trust Badges -->
+<div class="flex flex-wrap items-center gap-y-2 gap-x-4 pt-3 font-label-sm text-label-sm text-on-surface-variant">
+<span class="inline-flex items-center gap-1.5 font-bold">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed border border-primary"></span>
+            100% Fact Parity
+          </span>
+<span class="text-outline-variant">•</span>
+<span class="inline-flex items-center gap-1.5 font-bold">
+<span class="w-2 h-2 rounded-full bg-secondary-container border border-primary"></span>
+            Zero Hallucination Drift
+          </span>
+<span class="text-outline-variant">•</span>
+<span class="inline-flex items-center gap-1.5 font-bold">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+            No Credit Card Required
+          </span>
+</div>
+</div>
+<!-- Right Column: Interactive Graphic Architecture (6 Cols) -->
+<div class="lg:col-span-6 relative">
+<div class="relative bg-surface-container-lowest rounded-[24px] border-[1.5px] border-primary p-6 md:p-8 shadow-[6px_6px_0px_#000000] overflow-hidden min-h-[460px] flex items-center justify-center">
+<!-- Background Orbit Rings Pattern -->
+<div class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-30">
+<div class="w-96 h-96 rounded-full border border-dashed border-primary"></div>
+<div class="absolute w-72 h-72 rounded-full border border-primary/40"></div>
+<div class="absolute w-48 h-48 rounded-full border border-dashed border-primary"></div>
+</div>
+<!-- Decorative Neo-Brutalist Sparkles -->
+<span class="absolute top-4 right-6 text-xl text-primary font-black select-none">✦</span>
+<span class="absolute bottom-6 left-6 text-2xl text-tertiary-fixed font-black drop-shadow-[1px_1px_0px_#000000] select-none">✦</span>
+<!-- Status Indicator Chip -->
+<div class="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-surface-container border-[1.5px] border-primary shadow-[2px_2px_0px_#000000] font-label-sm text-label-sm font-extrabold text-primary flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed animate-pulse"></span>
+            1 INPUT ➔ 6 OUTPUTS
+          </div>
+<!-- Central Dynamic Diagram Hub -->
+<div class="relative z-10 w-full h-[400px] flex items-center justify-center">
+<!-- Center Node (Source Ingestion) -->
+<div class="relative z-20 w-36 h-36 rounded-2xl bg-primary text-on-primary border-[1.5px] border-primary shadow-[4px_4px_0px_#c8f250] flex flex-col items-center justify-center p-3 text-center transition-transform hover:scale-105">
+<span class="material-symbols-outlined text-[32px] text-tertiary-fixed mb-1">source_notes</span>
+<span class="font-label-md text-label-md font-bold tracking-tight text-on-primary leading-tight">DOCUMENT INGESTION</span>
+<span class="font-body-sm text-[10px] text-primary-fixed mt-1 font-mono">PDF • DOCX • BRIEF</span>
+</div>
+<!-- Satellite 1: Top Center (Official Advisory) -->
+<div class="absolute top-2 z-10 transform -translate-x-1/2 left-1/2">
+<div class="px-3.5 py-1.5 rounded-xl bg-surface-container-lowest border-[1.5px] border-primary shadow-[3px_3px_0px_#000000] flex items-center gap-1.5 text-primary">
+<span class="material-symbols-outlined text-[16px]">policy</span>
+<span class="font-label-sm text-label-sm font-bold">Official Advisory</span>
+</div>
+</div>
+<!-- Satellite 2: Top Right (Social Thread) -->
+<div class="absolute top-8 right-2 z-10">
+<div class="px-3.5 py-1.5 rounded-xl bg-secondary-container border-[1.5px] border-primary shadow-[3px_3px_0px_#000000] flex items-center gap-1.5 text-on-secondary-fixed">
+<span class="material-symbols-outlined text-[16px]">share</span>
+<span class="font-label-sm text-label-sm font-bold">Social Thread</span>
+</div>
+</div>
+<!-- Satellite 3: Bottom Right (Narrated Video) -->
+<div class="absolute bottom-8 right-2 z-10">
+<div class="px-3.5 py-1.5 rounded-xl bg-tertiary-fixed border-[1.5px] border-primary shadow-[3px_3px_0px_#000000] flex items-center gap-1.5 text-on-tertiary-fixed">
+<span class="material-symbols-outlined text-[16px]">videocam</span>
+<span class="font-label-sm text-label-sm font-bold">Narrated Video</span>
+</div>
+</div>
+<!-- Satellite 4: Bottom Center (Executive Summary) -->
+<div class="absolute bottom-2 z-10 transform -translate-x-1/2 left-1/2">
+<div class="px-3.5 py-1.5 rounded-xl bg-[#ffdad6] border-[1.5px] border-primary shadow-[3px_3px_0px_#000000] flex items-center gap-1.5 text-[#410002]">
+<span class="material-symbols-outlined text-[16px]">summarize</span>
+<span class="font-label-sm text-label-sm font-bold">Executive Summary</span>
+</div>
+</div>
+<!-- Satellite 5: Bottom Left (Presentation Deck) -->
+<div class="absolute bottom-8 left-2 z-10">
+<div class="px-3.5 py-1.5 rounded-xl bg-secondary-container border-[1.5px] border-primary shadow-[3px_3px_0px_#000000] flex items-center gap-1.5 text-on-secondary-fixed">
+<span class="material-symbols-outlined text-[16px]">slideshow</span>
+<span class="font-label-sm text-label-sm font-bold">Presentation Deck</span>
+</div>
+</div>
+<!-- Satellite 6: Top Left (Infographics) -->
+<div class="absolute top-8 left-2 z-10">
+<div class="px-3.5 py-1.5 rounded-xl bg-tertiary-fixed border-[1.5px] border-primary shadow-[3px_3px_0px_#000000] flex items-center gap-1.5 text-on-tertiary-fixed">
+<span class="material-symbols-outlined text-[16px]">leaderboard</span>
+<span class="font-label-sm text-label-sm font-bold">Infographics</span>
+</div>
+</div>
+<!-- Vector Connector Lines (SVG Underlay) -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+<!-- Radial Lines to Outer Satellites -->
+<line stroke="#17161B" stroke-dasharray="4 4" stroke-width="1.5" x1="50%" x2="50%" y1="50%" y2="12%"></line>
+<line stroke="#17161B" stroke-dasharray="4 4" stroke-width="1.5" x1="50%" x2="84%" y1="50%" y2="24%"></line>
+<line stroke="#17161B" stroke-dasharray="4 4" stroke-width="1.5" x1="50%" x2="84%" y1="50%" y2="76%"></line>
+<line stroke="#17161B" stroke-dasharray="4 4" stroke-width="1.5" x1="50%" x2="50%" y1="50%" y2="88%"></line>
+<line stroke="#17161B" stroke-dasharray="4 4" stroke-width="1.5" x1="50%" x2="16%" y1="50%" y2="76%"></line>
+<line stroke="#17161B" stroke-dasharray="4 4" stroke-width="1.5" x1="50%" x2="16%" y1="50%" y2="24%"></line>
+<!-- Subtle Directional Vector Indicator Points -->
+<circle cx="50%" cy="24%" fill="#17161B" r="3"></circle>
+<circle cx="70%" cy="34%" fill="#17161B" r="3"></circle>
+<circle cx="70%" cy="66%" fill="#17161B" r="3"></circle>
+<circle cx="50%" cy="76%" fill="#17161B" r="3"></circle>
+<circle cx="30%" cy="66%" fill="#17161B" r="3"></circle>
+<circle cx="30%" cy="34%" fill="#17161B" r="3"></circle>
+</svg>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 3: EFFORTLESS 3-STEP TRANSFORMATION -->
+<section id="how-it-works" class="w-full py-16">
+<div class="flex flex-col items-center text-center max-w-2xl mx-auto mb-12">
+<!-- Section Tag -->
+<div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-secondary-container border-[1.5px] border-primary shadow-[2px_2px_0px_#000000] mb-4">
+<span class="font-label-sm text-label-sm font-extrabold uppercase tracking-widest text-on-secondary-fixed">HOW IT WORKS</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg font-extrabold text-primary tracking-tight">
+        Effortless 3-Step Transformation
+      </h2>
+<p class="font-body-md text-body-md text-secondary mt-2">
+        From raw unformatted briefings to cross-platform strategic assets in less than ninety seconds.
+      </p>
+</div>
+<!-- 3 Step Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Card 01: Upload Source File -->
+<div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-2xl p-6 shadow-[4px_4px_0px_#000000] hover:shadow-[6px_6px_0px_#000000] hover:-translate-y-1 transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-6">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed border-[1.5px] border-primary shadow-[2px_2px_0px_#000000] flex items-center justify-center font-headline-sm text-headline-sm font-extrabold text-on-tertiary-fixed">
+              01
+            </div>
+<span class="material-symbols-outlined text-[28px] text-primary">cloud_upload</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary mb-2">Upload Source File</h3>
+<p class="font-body-md text-body-md text-secondary leading-relaxed">
+            Ingest any report, article, or intelligence brief in seconds with automated text parsing and semantic entity extraction.
+          </p>
+</div>
+<div class="mt-8 border-[1.5px] border-primary rounded-xl p-3 bg-surface-container-low flex justify-between items-center text-xs font-bold text-primary">
+<span class="font-label-sm text-label-sm">OCR &amp; Parsing</span>
+<span class="px-2 py-0.5 rounded bg-tertiary-fixed border border-primary text-[10px] uppercase font-black">Automatic</span>
+</div>
+</div>
+<!-- Card 02: Tune Parameters -->
+<div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-2xl p-6 shadow-[4px_4px_0px_#000000] hover:shadow-[6px_6px_0px_#000000] hover:-translate-y-1 transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-6">
+<div class="w-12 h-12 rounded-full bg-secondary-container border-[1.5px] border-primary shadow-[2px_2px_0px_#000000] flex items-center justify-center font-headline-sm text-headline-sm font-extrabold text-on-secondary-fixed">
+              02
+            </div>
+<span class="material-symbols-outlined text-[28px] text-primary">tune</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary mb-2">Tune Parameters</h3>
+<p class="font-body-md text-body-md text-secondary leading-relaxed">
+            Set custom audience, tone, detail level, and language with 1-click deterministic locks to safeguard brand integrity.
+          </p>
+</div>
+<div class="mt-8 border-[1.5px] border-primary rounded-xl p-3 bg-surface-container-low flex justify-between items-center text-xs font-bold text-primary">
+<span class="font-label-sm text-label-sm">Tone Governance</span>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-lowest border border-primary text-[10px] font-bold">Executive / Press</span>
+</div>
+</div>
+<!-- Card 03: Multi-Format Export -->
+<div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-2xl p-6 shadow-[4px_4px_0px_#000000] hover:shadow-[6px_6px_0px_#000000] hover:-translate-y-1 transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-6">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed border-[1.5px] border-primary shadow-[2px_2px_0px_#000000] flex items-center justify-center font-headline-sm text-headline-sm font-extrabold text-on-tertiary-fixed">
+              03
+            </div>
+<span class="material-symbols-outlined text-[28px] text-primary">download_for_offline</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary mb-2">Multi-Format Export</h3>
+<p class="font-body-md text-body-md text-secondary leading-relaxed">
+            Review and download 6 synchronized deliverables in parallel with zero fact drift and pre-configured asset bundles.
+          </p>
+</div>
+<div class="mt-8 border-[1.5px] border-primary rounded-xl p-3 bg-surface-container-low flex flex-col gap-1.5">
+<div class="flex justify-between items-center font-label-sm text-label-sm font-bold text-primary">
+<span>Synchronized Pack</span>
+<span class="text-on-tertiary-container">6/6 Ready</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full border border-primary overflow-hidden">
+<div class="bg-tertiary-fixed h-full w-full"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 4: 6 SYNCHRONIZED OUTPUTS FROM 1 SOURCE -->
+<section id="deliverables" class="w-full py-16">
+<div class="flex flex-col items-center text-center max-w-2xl mx-auto mb-12">
+<!-- Section Badge -->
+<div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-tertiary-fixed border-[1.5px] border-primary shadow-[2px_2px_0px_#000000] mb-4">
+<span class="font-label-sm text-label-sm font-extrabold uppercase tracking-widest text-on-tertiary-fixed">SYNCHRONIZED ENGINE</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg font-extrabold text-primary tracking-tight">
+        6 Synchronized Outputs From 1 Source
+      </h2>
+<p class="font-body-md text-body-md text-secondary mt-2">
+        Every format is synthesized simultaneously while locking core entities, figures, and strategic takeaways.
+      </p>
+</div>
+<!-- 2x3 Matrix of Output Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Output 1: Social Campaign -->
+<div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-2xl p-6 shadow-[4px_4px_0px_#000000] hover:shadow-[6px_6px_0px_#000000] transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary">Social Campaign</h3>
+<span class="px-2.5 py-0.5 rounded-full bg-secondary-container border border-primary font-label-sm text-[10px] font-black uppercase text-on-secondary-fixed">LIVE PREVIEW</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mb-4">
+            Thread &amp; LinkedIn post variants engineered for peak narrative retention.
+          </p>
+<!-- Mini UI Sandbox -->
+<div class="border-[1.5px] border-primary rounded-xl p-4 bg-surface-container-low mb-6">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold">U</div>
+<span class="font-label-sm text-label-sm font-bold text-primary">@UnifiOps</span>
+<span class="material-symbols-outlined text-[14px] text-primary">verified</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface leading-tight mb-3">
+              The Q3 operational benchmark shifts resource allocation toward deterministic pipelines. Key finding: 34% speed gain.
+            </p>
+<div class="flex gap-2">
+<span class="font-mono text-[10px] text-secondary font-bold">#TechInsights</span>
+<span class="font-mono text-[10px] text-secondary font-bold">#Automation</span>
+</div>
+</div>
+</div>
+<div class="border-t-[1.5px] border-primary/20 pt-3 flex items-center justify-between text-primary font-label-sm text-label-sm font-bold">
+<span>Formatted for X &amp; LinkedIn</span>
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+</div>
+</div>
+<!-- Output 2: Video Briefing -->
+<div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-2xl p-6 shadow-[4px_4px_0px_#000000] hover:shadow-[6px_6px_0px_#000000] transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary">Video Briefing</h3>
+<span class="px-2.5 py-0.5 rounded-full bg-tertiary-fixed border border-primary font-label-sm text-[10px] font-black uppercase text-on-tertiary-fixed">AUDIO + SCENE</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mb-4">
+            Auto-timed video slides with studio speech voiceover and captions.
+          </p>
+<!-- Mini UI Sandbox -->
+<div class="border-[1.5px] border-primary rounded-xl overflow-hidden bg-primary text-on-primary p-3 mb-6 relative aspect-video flex flex-col justify-between">
+<div class="flex justify-between items-center z-10">
+<span class="px-1.5 py-0.5 bg-surface-container-lowest/20 rounded text-[9px] font-mono tracking-widest">1080p HD</span>
+<span class="font-mono text-[10px] text-tertiary-fixed font-bold">00:48 / 02:15</span>
+</div>
+<div class="self-center my-auto w-10 h-10 rounded-full bg-tertiary-fixed border-[1.5px] border-primary flex items-center justify-center text-primary shadow-[2px_2px_0px_#000000] cursor-pointer">
+<span class="material-symbols-outlined text-[24px]">play_arrow</span>
+</div>
+<div class="bg-black/60 backdrop-blur-sm p-1.5 rounded border border-white/20 z-10">
+<p class="font-mono text-[10px] text-surface-container-lowest truncate">CC: Executive briefing synthesis active: "Efficiency indexes hit parity..."</p>
+</div>
+</div>
+</div>
+<div class="border-t-[1.5px] border-primary/20 pt-3 flex items-center justify-between text-primary font-label-sm text-label-sm font-bold">
+<span>MP4 / WebM Rendered</span>
+<span class="material-symbols-outlined text-[18px]">movie</span>
+</div>
+</div>
+<!-- Output 3: Official Advisory -->
+<div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-2xl p-6 shadow-[4px_4px_0px_#000000] hover:shadow-[6px_6px_0px_#000000] transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary">Official Advisory</h3>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container border border-primary font-label-sm text-[10px] font-black uppercase text-primary">FORMAL</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mb-4">
+            Institutional document architecture with sign-off headers and hash codes.
+          </p>
+<!-- Mini UI Sandbox -->
+<div class="border-[1.5px] border-primary rounded-xl p-4 bg-surface-container-low mb-6 flex flex-col gap-2">
+<div class="flex justify-between items-center border-b-[1.5px] border-primary pb-1.5">
+<span class="font-mono text-[10px] font-bold text-primary tracking-wider">DOC-ID: UOPS-2025-09</span>
+<span class="px-1.5 py-0.5 rounded bg-error-container text-on-error-container font-mono text-[9px] font-black">LEVEL 2</span>
+</div>
+<div class="font-headline-sm text-[13px] font-black text-primary uppercase">ARCHITECTURE ADVISORY BULLETIN</div>
+<div class="space-y-1 py-1">
+<div class="w-full h-1.5 bg-outline-variant/60 rounded"></div>
+<div class="w-4/5 h-1.5 bg-outline-variant/60 rounded"></div>
+<div class="w-3/5 h-1.5 bg-outline-variant/60 rounded"></div>
+</div>
+<div class="flex justify-between items-center text-[10px] font-mono text-secondary pt-1 border-t border-dashed border-primary/30">
+<span>Authority: Operations</span>
+<span class="font-bold text-primary">Sig: Verified</span>
+</div>
+</div>
+</div>
+<div class="border-t-[1.5px] border-primary/20 pt-3 flex items-center justify-between text-primary font-label-sm text-label-sm font-bold">
+<span>Printable PDF / A4 Ready</span>
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</div>
+</div>
+<!-- Output 4: Executive Summary -->
+<div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-2xl p-6 shadow-[4px_4px_0px_#000000] hover:shadow-[6px_6px_0px_#000000] transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary">Executive Summary</h3>
+<span class="px-2.5 py-0.5 rounded-full bg-secondary-container border border-primary font-label-sm text-[10px] font-black uppercase text-on-secondary-fixed">1-PAGE CONDENSED</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mb-4">
+            C-suite level condensed bullet points and deterministic metric highlights.
+          </p>
+<!-- Mini UI Sandbox -->
+<div class="border-[1.5px] border-primary rounded-xl p-4 bg-surface-container-low mb-6 space-y-2.5">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed-dim shrink-0">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium leading-tight">Revenue run-rate up 34% QoQ</span>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed-dim shrink-0">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium leading-tight">Operational latency dropped to 42ms</span>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed-dim shrink-0">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium leading-tight">100% Parity across 6 target channels</span>
+</div>
+</div>
+</div>
+<div class="border-t-[1.5px] border-primary/20 pt-3 flex items-center justify-between text-primary font-label-sm text-label-sm font-bold">
+<span>Digest for Board &amp; Leadership</span>
+<span class="material-symbols-outlined text-[18px]">article</span>
+</div>
+</div>
+<!-- Output 5: Presentation Deck -->
+<div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-2xl p-6 shadow-[4px_4px_0px_#000000] hover:shadow-[6px_6px_0px_#000000] transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary">Presentation Deck</h3>
+<span class="px-2.5 py-0.5 rounded-full bg-tertiary-fixed border border-primary font-label-sm text-[10px] font-black uppercase text-on-tertiary-fixed">SLIDE KIT</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mb-4">
+            Synthesized deck with structured agenda, narrative arcs, and metric cards.
+          </p>
+<!-- Mini UI Sandbox -->
+<div class="border-[1.5px] border-primary rounded-xl p-4 bg-surface-container-low mb-6 flex flex-col justify-between h-32 relative overflow-hidden">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-[11px] font-extrabold text-primary">SLIDE 04: CORE METRICS</span>
+<span class="px-1.5 py-0.5 rounded bg-tertiary-fixed border border-primary font-mono text-[9px] font-black">+34.6%</span>
+</div>
+<!-- Slide Chart Simulation -->
+<div class="flex items-end gap-2 h-14 pt-2">
+<div class="w-1/4 bg-primary/20 h-2/5 rounded-t"></div>
+<div class="w-1/4 bg-primary/40 h-3/5 rounded-t"></div>
+<div class="w-1/4 bg-secondary-container border-t border-l border-r border-primary h-4/5 rounded-t"></div>
+<div class="w-1/4 bg-tertiary-fixed border-t border-l border-r border-primary h-full rounded-t"></div>
+</div>
+</div>
+</div>
+<div class="border-t-[1.5px] border-primary/20 pt-3 flex items-center justify-between text-primary font-label-sm text-label-sm font-bold">
+<span>PPTX / Keynote Compatible</span>
+<span class="material-symbols-outlined text-[18px]">co_present</span>
+</div>
+</div>
+<!-- Output 6: Infographics -->
+<div class="bg-surface-container-lowest border-[1.5px] border-primary rounded-2xl p-6 shadow-[4px_4px_0px_#000000] hover:shadow-[6px_6px_0px_#000000] transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary">Infographics</h3>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container border border-primary font-label-sm text-[10px] font-black uppercase text-primary">VECTOR DATA</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mb-4">
+            Clean 3-stage flowchart layouts and data cards synthesized from stats.
+          </p>
+<!-- Mini UI Sandbox -->
+<div class="border-[1.5px] border-primary rounded-xl p-4 bg-surface-container-low mb-6 flex items-center justify-between gap-1">
+<div class="border border-primary rounded-lg p-2 bg-surface-container-lowest text-center flex-1">
+<span class="block font-mono text-[9px] font-bold text-secondary">STAGE 1</span>
+<span class="font-label-sm text-[10px] font-black text-primary">In Brief</span>
+</div>
+<span class="material-symbols-outlined text-[14px] text-primary">arrow_forward</span>
+<div class="border border-primary rounded-lg p-2 bg-secondary-container text-center flex-1">
+<span class="block font-mono text-[9px] font-bold text-secondary">STAGE 2</span>
+<span class="font-label-sm text-[10px] font-black text-primary">AI Sync</span>
+</div>
+<span class="material-symbols-outlined text-[14px] text-primary">arrow_forward</span>
+<div class="border border-primary rounded-lg p-2 bg-tertiary-fixed text-center flex-1">
+<span class="block font-mono text-[9px] font-bold text-secondary">STAGE 3</span>
+<span class="font-label-sm text-[10px] font-black text-primary">6X Outputs</span>
+</div>
+</div>
+</div>
+<div class="border-t-[1.5px] border-primary/20 pt-3 flex items-center justify-between text-primary font-label-sm text-label-sm font-bold">
+<span>SVG &amp; High-Res PNG</span>
+<span class="material-symbols-outlined text-[18px]">schema</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 5: CALL-TO-ACTION BANNER -->
+<section id="contact" class="w-full py-12 mb-8">
+<div class="relative bg-secondary-container border-[1.5px] border-primary rounded-[24px] p-8 md:p-12 shadow-[6px_6px_0px_#000000] overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+<!-- Watermark Background Graphic Accent -->
+<span class="absolute right-4 -bottom-10 text-[180px] font-black text-primary opacity-5 select-none pointer-events-none tracking-tighter">6X</span>
+<!-- Left Column / Callout Details -->
+<div class="flex flex-col items-start max-w-xl z-10">
+<span class="border-[1.5px] border-primary bg-surface-container-lowest text-primary font-label-sm text-label-sm font-extrabold px-3 py-1 rounded-full mb-4 inline-block shadow-[2px_2px_0px_#000000]">
+          INSTANT ROLLOUT
+        </span>
+<h2 class="font-headline-lg text-headline-lg font-extrabold text-primary tracking-tight leading-tight mb-2">
+          Ready to transform your content in seconds?
+        </h2>
+<p class="font-body-md text-body-md text-on-secondary-fixed leading-relaxed">
+          Join forward-thinking teams converting complex documents into multi-channel campaigns effortlessly. No hallucination drift, guaranteed.
+        </p>
+</div>
+<!-- Right Column / Action Trigger -->
+<div class="flex flex-col items-center md:items-end z-10 shrink-0">
+<a class="inline-flex items-center gap-3 px-10 py-5 bg-primary text-on-primary rounded-full font-label-lg text-label-lg font-extrabold border-[1.5px] border-primary shadow-[4px_4px_0px_#000000] hover:shadow-[6px_6px_0px_#000000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-none transition-all whitespace-nowrap" href="/chat">
+<span>Generate All 6 Formats</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</a>
+<span class="font-label-sm text-label-sm text-on-secondary-fixed-variant font-bold mt-3">
+          No credit card required • First 3 briefings free
+        </span>
+</div>
+</div>
+</section>
+</div></main><footer class="w-full bg-surface-container-lowest border-t-[1.5px] border-[#17161B] mt-space-xl py-space-xl"><div class="max-w-7xl mx-auto px-margin-sm md:px-margin flex flex-col md:flex-row items-center justify-between gap-space-lg"><div class="flex flex-col items-center md:items-start gap-space-xs"><div class="flex items-center gap-space-sm"><div class="w-6 h-6 rounded bg-primary flex items-center justify-center border-[1.5px] border-[#17161B]"><span class="w-2 h-2 bg-tertiary-fixed rounded-xs transform rotate-45"></span></div><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface" style="font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em; color: #000000;">UnifiOps</span></div><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="mailto:support@UnifiOps.com">support@UnifiOps.com</a></div><div class="flex flex-col md:flex-row items-center gap-space-md md:gap-space-lg"><div class="flex items-center gap-space-md"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="privacy-policy" href="/">Privacy Policy</a><span class="text-outline-variant">•</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="security-charter" href="/">Security Charter</a><span class="text-outline-variant">•</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="terms-of-service" href="/">Terms</a></div><span class="font-body-sm text-body-sm text-on-surface-variant">© 2026 UnifiOps Inc. All rights reserved.</span></div></div></footer><script>
+document.addEventListener('DOMContentLoaded', () => {
+  const navLinks = document.querySelectorAll('nav a[href^="#"]');
+  const activeClasses = ['bg-primary', 'text-on-primary', 'rounded-full', 'px-space-md', 'py-space-xs', 'font-label-md'];
+  const inactiveClasses = ['font-label-lg', 'text-label-lg', 'text-on-surface-variant', 'hover:text-on-surface', 'transition-colors'];
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', function() {
+      navLinks.forEach(l => {
+        l.classList.remove(...activeClasses);
+        l.classList.add(...inactiveClasses);
+        l.removeAttribute('aria-current');
+      });
+      this.classList.remove(...inactiveClasses);
+      this.classList.add(...activeClasses);
+      this.setAttribute('aria-current', 'page');
+    });
+  });
+});
+</script>
+</body></html>

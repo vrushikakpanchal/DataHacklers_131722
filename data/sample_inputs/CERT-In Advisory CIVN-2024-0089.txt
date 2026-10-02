@@ -1,0 +1,12 @@
+CERT-In Advisory CIVN-2024-0089
+Severity: Critical
+Affected Products: Cisco RV160, RV260, RV340, and RV345 Series Routers
+
+Overview:
+A critical vulnerability (CVE-2024-20353) has been identified in the web-based management interface of Cisco Small Business Routers. An unauthenticated remote attacker could exploit this vulnerability to execute arbitrary commands as root on the underlying operating system.
+
+Technical Impact:
+The flaw is caused by improper validation of HTTP requests. An attacker can exploit this by sending crafted HTTP requests to the targeted device's management web interface, leading to full device compromise.
+
+Recommendation:
+Cisco has released software updates that address this vulnerability. Network administrators are advised to disable remote management access over HTTP/HTTPS if not strictly required and apply patch updates immediately.
