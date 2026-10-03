@@ -63,3 +63,4 @@ Thumbs.db
 
 # Streamlit local state
 .streamlit/secrets.toml
+.aider*

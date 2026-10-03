@@ -8,49 +8,207 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <style>
+    /* Bulletin refinement - additive only (existing markup/scripts untouched) */
+    #advisorySeverity{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .75rem;border:1.5px solid #0f172a;border-radius:9999px;background:#fff;color:#0f172a;font-weight:700;font-size:.75rem;line-height:1.2;letter-spacing:.05em;text-transform:uppercase;vertical-align:middle;}
+    #advisorySeverity::before{content:"";width:.5rem;height:.5rem;border-radius:9999px;background:currentColor;}
+    #advisorySeverity.sev-critical{background:#FFDAD6;color:#93000A;border-color:#93000A;}
+    #advisorySeverity.sev-high{background:#FFDAD6;color:#93000A;}
+    #advisorySeverity.sev-medium{background:#FFF1C9;color:#5F4300;}
+    #advisorySeverity.sev-low{background:#C8F250;color:#161F00;}
+    #advisoryCves span[class*="F0E6FF"]{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.03em;}
+    #advisoryOverview,#advisoryAffected,#advisoryActions{line-height:1.7;}
+    #advisoryOverview{max-width:65ch;}
+    #advisoryAffected li::marker,#advisoryActions li::marker{color:#17161B;font-weight:700;}
+    #advisoryAffected li,#advisoryActions li{padding-left:.25rem;}
+    #downloadAdvisory[hidden]{display:none!important;}
+  </style>
+  <style id="advisory-report-v2">
+    /* =====================================================================
+       [REPORT v2] Institutional threat-report layer. Existing rules above are untouched.
+       Tokens: ink #0f172a - lavender #F0E6FF/#3B1262 - lime #C8F250 - danger #93000A
+       ===================================================================== */
+    .advisory-shell{--ink:#0f172a;--lav:#F0E6FF;--lav-ink:#3B1262;--lime:#C8F250;--danger:#93000A;--hair:#E2E8F0;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--display:'Plus Jakarta Sans','Inter',system-ui,sans-serif;}
+    .advisory-shell .material-symbols-outlined{font-size:18px;line-height:1;}
+
+    /* 1. Banner */
+    .adv-eyebrow{display:inline-flex;align-items:center;gap:.4rem;margin:0;font:800 11px/16px var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--ink);padding:.2rem .65rem .2rem .5rem;border:1.5px solid var(--ink);border-radius:9999px;background:var(--lav);}
+    .adv-eyebrow .material-symbols-outlined{font-size:15px;color:var(--lav-ink);}
+    .adv-titlerow{display:flex;align-items:flex-start;gap:.9rem;margin-top:1rem;}
+    .adv-title{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,3vw,2.25rem);line-height:1.15;letter-spacing:-.025em;color:#0b1220;overflow-wrap:anywhere;}
+    .adv-dot{--dot:#94A3B8;--glow:rgba(148,163,184,.28);flex-shrink:0;width:14px;height:14px;margin-top:.7rem;border-radius:9999px;background:var(--dot);box-shadow:0 0 0 4px var(--glow),0 0 12px var(--dot);}
+    .advisory-shell[data-sev="critical"] .adv-dot,.advisory-shell[data-sev="high"] .adv-dot{--dot:#E5383B;--glow:rgba(229,56,59,.22);animation:adv-pulse 1.8s ease-in-out infinite;}
+    .advisory-shell[data-sev="medium"] .adv-dot{--dot:#F5A524;--glow:rgba(245,165,36,.25);}
+    .advisory-shell[data-sev="low"] .adv-dot{--dot:#84CC16;--glow:rgba(132,204,22,.25);}
+    @keyframes adv-pulse{0%,100%{box-shadow:0 0 0 4px var(--glow),0 0 10px var(--dot);}50%{box-shadow:0 0 0 8px transparent,0 0 20px var(--dot);}}
+    .adv-ref{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin:.9rem 0 0;font-size:.8rem;font-weight:600;color:#64748B;}
+    .adv-ref__label{font:800 10px/14px var(--display);letter-spacing:.12em;text-transform:uppercase;color:#64748B;}
+
+    /* Monospace code badges (reference IDs, CVEs) */
+    .adv-code{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .6rem;border:1.5px solid var(--ink);border-radius:8px;background:#F1F5F9;color:var(--ink);font-family:var(--mono);font-size:.78rem;font-weight:700;letter-spacing:.03em;line-height:1.3;text-decoration:none;transition:transform .12s ease,box-shadow .12s ease,background-color .12s ease;}
+    a.adv-code:hover{background:var(--lav);transform:translate(-1px,-1px);box-shadow:2px 2px 0 var(--ink);}
+    a.adv-code::after{content:"\2197";font-size:.7rem;opacity:.55;}
+    .adv-code.is-empty,.adv-code.is-disabled{background:#F8FAFC;color:#94A3B8;border:1.5px dashed #CBD5E1;font-weight:600;cursor:not-allowed;}
+
+    /* 2. Metrics strip */
+    .adv-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-top:1.5rem;}
+    @media (max-width:1023px){.adv-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}
+    @media (max-width:559px){.adv-metrics{grid-template-columns:1fr;}}
+    .adv-metric{display:flex;flex-direction:column;gap:.6rem;min-width:0;padding:.9rem 1rem;border:2px solid var(--ink);border-radius:12px;background:#fff;box-shadow:2px 2px 0 var(--ink);}
+    .adv-metric__label{display:flex;align-items:center;gap:.35rem;margin:0;font:800 10px/14px var(--display);letter-spacing:.12em;text-transform:uppercase;color:#64748B;}
+    .adv-metric__label .material-symbols-outlined{font-size:15px;color:var(--ink);}
+    .adv-metric__value{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;min-height:30px;}
+    .adv-pill{display:inline-flex;align-items:center;padding:.25rem .65rem;border:1.5px solid var(--ink);border-radius:9999px;background:var(--lav);color:var(--lav-ink);font:700 12px/16px var(--display);letter-spacing:.01em;}
+    .adv-pill.is-inferred{border-style:dashed;}
+    .adv-pill.is-empty{background:#F8FAFC;color:#94A3B8;border:1.5px dashed #CBD5E1;font-weight:600;}
+    /* Severity badge: larger + glowing in the tile (beats the original #advisorySeverity rule by specificity) */
+    .advisory-shell .adv-metric #advisorySeverity{font-size:.8rem;padding:.35rem .9rem;}
+    .advisory-shell #advisorySeverity.sev-critical,.advisory-shell #advisorySeverity.sev-high{box-shadow:0 0 0 3px rgba(229,56,59,.16),0 0 16px rgba(229,56,59,.5);}
+    .advisory-shell #advisorySeverity.sev-medium{box-shadow:0 0 0 3px rgba(245,165,36,.18),0 0 14px rgba(245,165,36,.45);}
+    .advisory-shell #advisorySeverity.sev-low{box-shadow:0 0 0 3px rgba(132,204,22,.2),0 0 14px rgba(132,204,22,.5);}
+
+    /* Cards */
+    .adv-card{border:2px solid var(--ink);border-radius:12px;padding:1.5rem;background:#fff;box-shadow:2px 2px 0 var(--ink);}
+    .adv-card__title{display:flex;align-items:center;gap:.6rem;margin:0;padding-bottom:.75rem;border-bottom:1.5px solid var(--hair);font:800 1.05rem/1.3 var(--display);letter-spacing:-.01em;}
+    .adv-card__icon{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1.5px solid var(--ink);border-radius:8px;background:var(--lav);color:var(--lav-ink);}
+    .adv-label{margin:0;font:800 10px/14px var(--display);letter-spacing:.12em;text-transform:uppercase;color:#64748B;}
+
+    /* 3. Overview keyword highlighting + fallback */
+    #advisoryOverview .kw{font-weight:600;color:var(--lav-ink);}
+    #advisoryOverview .kw-id{font-family:var(--mono);font-size:.85em;color:var(--ink);background:#F1F5F9;border:1px solid #CBD5E1;border-radius:6px;padding:.05rem .35rem;}
+    #advisoryOverview .kw-vector{background:linear-gradient(transparent 58%,#E1E0FF 58%);}
+    #advisoryOverview .kw-campaign{background:var(--lav);border:1px solid rgba(59,18,98,.35);border-radius:6px;padding:0 .3rem;}
+    #advisoryOverview.adv-empty{padding:.85rem 1rem;border:1.5px dashed #CBD5E1;border-radius:10px;background:#F8FAFC;color:#64748B;font-style:italic;}
+
+    /* Affected systems */
+    .adv-syslist{list-style:none;margin:.75rem 0 0;padding:0;display:flex;flex-direction:column;gap:.5rem;}
+    .adv-sys{display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;border:1.5px solid var(--hair);border-radius:10px;background:#F8FAFC;font-size:.875rem;font-weight:600;color:#1e293b;}
+    .adv-sys__icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:30px;height:30px;border:1.5px solid var(--ink);border-radius:8px;background:#fff;color:var(--ink);}
+    .adv-fallback{display:flex;align-items:flex-start;gap:.75rem;margin-top:.75rem;padding:.85rem 1rem;border:1.5px dashed #94A3B8;border-radius:10px;background:#F8FAFC;color:#475569;font-size:.875rem;}
+    .adv-fallback strong{display:block;color:#1e293b;font-weight:700;}
+    .adv-fallback small{display:block;margin-top:.15rem;color:#64748B;font-size:.75rem;}
+    .adv-fallback .material-symbols-outlined{color:#64748B;margin-top:.1rem;}
+
+    /* 4. Remediation: action cards + priority callout */
+    .adv-actgrid{list-style:none;margin:.75rem 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;}
+    @media (max-width:767px){.adv-actgrid{grid-template-columns:1fr;}}
+    .adv-act{display:flex;align-items:flex-start;gap:.75rem;padding:.85rem 1rem;border:1.5px solid var(--ink);border-radius:10px;background:#fff;}
+    .adv-act__num{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:28px;height:28px;border-radius:8px;background:var(--ink);color:#fff;font:800 12px/1 var(--display);}
+    .adv-act__text{margin:0;font-size:.875rem;line-height:1.55;color:#334155;}
+    .adv-act .act-verb{font-family:var(--display);font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--lav-ink);}
+    .adv-callout{margin-top:1rem;padding:1rem;border:2px solid var(--danger);border-radius:12px;background:#FFF5F4;box-shadow:3px 3px 0 var(--danger);}
+    .adv-callout__head{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+    .adv-callout__icon{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9999px;background:var(--danger);color:#fff;}
+    .adv-callout__title{font:800 12px/16px var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--danger);}
+    .adv-callout__sub{font-size:.75rem;font-weight:600;color:#7a2a2a;}
+    .adv-callout .adv-act{border-color:var(--danger);}
+    .adv-callout .adv-act__num{background:var(--danger);}
+    .adv-callout .act-verb{color:var(--danger);}
+    .adv-more{margin-top:1.25rem;}
+
+    /* 5. Footer bar (full-bleed inside the shell) */
+    .adv-footer{margin:2rem -1.5rem -1.5rem;padding:1.25rem 1.5rem;border-top:2px solid var(--ink);background:#F8FAFC;border-radius:0 0 12px 12px;}
+    @media (min-width:640px){.adv-footer{margin:2.5rem -2.5rem -2.5rem;padding:1.25rem 2.5rem;}}
+    .adv-footer__actions{display:flex;flex-wrap:wrap;gap:.75rem;}
+    .adv-btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.8rem 1.4rem;border:2px solid var(--ink);border-radius:9999px;font:800 .875rem/1.2 var(--display);color:var(--ink);text-decoration:none;box-shadow:3px 3px 0 var(--ink);transition:transform .12s ease,box-shadow .12s ease;}
+    .adv-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink);}
+    .adv-btn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink);}
+    .adv-btn--primary{background:var(--lime);color:#161F00;}
+    .adv-btn--secondary{background:#fff;}
+    .adv-notice{margin:.9rem 0 0;font-size:.875rem;color:#475569;}
+    .adv-notice:empty{display:none;}
+    #advisoryAffected[hidden],#advisoryActions[hidden],#advisoryAffectedView[hidden],#advisoryActionsView[hidden]{display:none!important;}
+
+    @media (prefers-reduced-motion:reduce){.adv-dot{animation:none!important;}.adv-btn,a.adv-code{transition:none;}}
+  </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
-  <header class="border-b-2 border-slate-900 bg-white">
-    <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between">
-        <a href="/" class="text-2xl font-extrabold tracking-tight" style="font-family:'Plus Jakarta Sans','Inter',system-ui,sans-serif">UnifiOps</a>
-        <span class="text-xs font-medium uppercase tracking-wider text-slate-500">Official Advisory</span>
+  <header class="sticky top-0 left-0 right-0 z-50 bg-white border-b-[1.5px] border-slate-900">
+  <div class="h-16 max-w-[1280px] mx-auto px-6 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <span class="justify-self-start font-extrabold tracking-tight text-slate-950 shrink-0" style="font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em;">UnifiOps</span>
+    <div class="hidden sm:flex items-center justify-center gap-2 min-w-0">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-[1.5px] border-slate-900 bg-white font-bold uppercase text-[10px] tracking-wide text-slate-800">
+        <span class="material-symbols-outlined text-[15px] leading-none shrink-0">description</span>
+        <span id="sourceDocumentBadge" class="truncate max-w-[200px] leading-none">Uploaded Document</span>
       </div>
-      <nav class="flex w-full flex-row flex-wrap items-center justify-center gap-2.5" aria-label="Deliverable navigation">
-        <a href="/social" class="rounded-full border-2 border-slate-900 bg-white px-5 py-1.5 text-center text-xs font-bold text-slate-800 hover:bg-slate-100">LinkedIn &amp; X</a>
-        <a href="/video" class="rounded-full border-2 border-slate-900 bg-white px-5 py-1.5 text-center text-xs font-bold text-slate-800 hover:bg-slate-100">Video Script &amp; Preview</a>
-        <a href="/advisory" aria-current="page" class="rounded-full border-2 border-slate-950 bg-[#F0E6FF] px-5 py-1.5 text-center text-xs font-bold text-[#3B1262] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">Official Advisory</a>
-        <a href="/summary" class="rounded-full border-2 border-slate-900 bg-white px-5 py-1.5 text-center text-xs font-bold text-slate-800 hover:bg-slate-100">Executive Summary</a>
-        <a href="/slides" class="rounded-full border-2 border-slate-900 bg-white px-5 py-1.5 text-center text-xs font-bold text-slate-800 hover:bg-slate-100">Slide Deck</a>
-        <a href="/infographics" class="rounded-full border-2 border-slate-900 bg-white px-5 py-1.5 text-center text-xs font-bold text-slate-800 hover:bg-slate-100">Infographics</a>
-      </nav>
+      <span id="audienceBadge" class="inline-flex items-center justify-center px-3 py-1 rounded-full border-[1.5px] border-slate-900 bg-[#C8F250] text-slate-900 font-bold uppercase text-[10px] tracking-wide leading-none shrink-0">General</span>
+      <span id="toneBadge" class="inline-flex items-center justify-center px-3 py-1 rounded-full border-[1.5px] border-slate-900 bg-[#E1E0FF] text-slate-800 font-bold uppercase text-[10px] tracking-wide leading-none shrink-0">Professional</span>
     </div>
-  </header>
+    <div class="justify-self-end flex items-center gap-3 shrink-0">
+      <a class="inline-flex items-center px-4 py-1.5 bg-white text-slate-900 border-[1.5px] border-slate-900 rounded-full text-xs font-bold shadow-[3px_3px_0px_#1c1b20] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#1c1b20] transition-all" data-path="deliverables-list" href="/processing">← Back to All Deliverables</a>
+      <div class="w-8 h-8 rounded-full bg-slate-950 flex items-center justify-center border-[1.5px] border-slate-900 shadow-[2px_2px_0px_#1c1b20]"><span class="material-symbols-outlined text-white text-[18px]">person</span></div>
+    </div>
+  </div>
+  <div class="h-14 border-t-[1.5px] border-slate-900 bg-white flex items-center">
+    <nav class="max-w-[1280px] mx-auto px-6 w-full flex flex-row flex-nowrap items-center justify-center gap-2.5 overflow-x-auto no-scrollbar py-1" role="navigation" aria-label="Deliverable navigation"><a href="/social" class="rounded-full px-5 py-1.5 text-xs font-bold border-[1.5px] border-slate-900 bg-white text-slate-800 hover:bg-slate-100 transition inline-flex items-center justify-center shrink-0">LinkedIn &amp; X</a><a href="/video" class="rounded-full px-5 py-1.5 text-xs font-bold border-[1.5px] border-slate-900 bg-white text-slate-800 hover:bg-slate-100 transition inline-flex items-center justify-center shrink-0">Video Script &amp; Preview</a><a href="/advisory" class="rounded-full px-5 py-1.5 text-xs font-bold border-2 border-slate-950 bg-[#F0E6FF] text-[#3B1262] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] inline-flex items-center justify-center shrink-0" aria-current="page">Official Advisory</a><a href="/summary" class="rounded-full px-5 py-1.5 text-xs font-bold border-[1.5px] border-slate-900 bg-white text-slate-800 hover:bg-slate-100 transition inline-flex items-center justify-center shrink-0">Executive Summary</a><a href="/slides" class="rounded-full px-5 py-1.5 text-xs font-bold border-[1.5px] border-slate-900 bg-white text-slate-800 hover:bg-slate-100 transition inline-flex items-center justify-center shrink-0">Slide Deck</a><a href="/infographics" class="rounded-full px-5 py-1.5 text-xs font-bold border-[1.5px] border-slate-900 bg-white text-slate-800 hover:bg-slate-100 transition inline-flex items-center justify-center shrink-0">Infographics</a></nav>
+  </div>
+</header>
   <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-    <section class="rounded-2xl border-2 border-slate-900 bg-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:p-8">
-      <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Security advisory</p>
-      <h1 id="advisoryTitle" class="mt-2 text-2xl font-extrabold tracking-tight">Official Advisory</h1>
-      <p id="advisoryReference" class="mt-2 text-sm font-semibold text-slate-600">Reference ID: Not identified</p>
-      <div class="mt-6 grid gap-5 lg:grid-cols-2">
-        <article class="rounded-xl border-2 border-slate-900 p-5">
-          <h2 class="text-lg font-extrabold">Vulnerability overview</h2>
+    <section id="advisoryShell" class="advisory-shell rounded-2xl border-2 border-slate-900 bg-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:p-10" data-sev="none">
+
+      <!-- [REPORT v2] 1. Banner: eyebrow, glowing dot + title, reference-ID badge -->
+      <div class="adv-banner">
+        <p class="adv-eyebrow"><span class="material-symbols-outlined" aria-hidden="true">shield</span>Security advisory</p>
+        <div class="adv-titlerow">
+          <span id="advisoryDot" class="adv-dot" aria-hidden="true"></span>
+          <h1 id="advisoryTitle" class="adv-title">Official Advisory</h1>
+        </div>
+        <p id="advisoryReference" class="adv-ref">Reference ID: Not identified</p>
+      </div>
+
+      <!-- [REPORT v2] 2. Key metrics strip (severity span keeps its original id + classifier) -->
+      <div class="adv-metrics" role="list" aria-label="Key advisory metrics">
+        <div class="adv-metric" role="listitem">
+          <p class="adv-metric__label"><span class="material-symbols-outlined" aria-hidden="true">crisis_alert</span>Severity rating</p>
+          <div class="adv-metric__value"><span id="advisorySeverity">Not available</span></div>
+        </div>
+        <div class="adv-metric" role="listitem">
+          <p class="adv-metric__label"><span class="material-symbols-outlined" aria-hidden="true">category</span>Threat category</p>
+          <div id="advisoryCategory" class="adv-metric__value"><span class="adv-pill is-empty">Not specified</span></div>
+        </div>
+        <div class="adv-metric" role="listitem">
+          <p class="adv-metric__label"><span class="material-symbols-outlined" aria-hidden="true">devices</span>Target platform</p>
+          <div id="advisoryPlatform" class="adv-metric__value"><span class="adv-pill is-empty">Not specified</span></div>
+        </div>
+        <div class="adv-metric" role="listitem">
+          <p class="adv-metric__label"><span class="material-symbols-outlined" aria-hidden="true">route</span>Execution vectors</p>
+          <div id="advisoryVectors" class="adv-metric__value"><span class="adv-pill is-empty">Not specified</span></div>
+        </div>
+      </div>
+
+      <div class="mt-6 grid gap-6 lg:grid-cols-2">
+        <article class="adv-card">
+          <h2 class="adv-card__title"><span class="adv-card__icon material-symbols-outlined" aria-hidden="true">fact_check</span>Vulnerability overview</h2>
           <p id="advisoryOverview" class="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700">Upload a document via Chat to generate an official advisory.</p>
-          <p class="mt-4 text-sm"><strong>Severity:</strong> <span id="advisorySeverity">Not available</span></p>
+          <div class="mt-5">
+            <p class="adv-label">Identified CVEs</p>
+            <div id="advisoryCves" class="mt-2 flex flex-wrap gap-2"><span class="text-sm text-slate-500">No CVE identifiers identified.</span></div>
+          </div>
         </article>
-        <article class="rounded-xl border-2 border-slate-900 p-5">
-          <h2 class="text-lg font-extrabold">Affected software and systems</h2>
+        <article class="adv-card">
+          <h2 class="adv-card__title"><span class="adv-card__icon material-symbols-outlined" aria-hidden="true">devices</span>Affected software and systems</h2>
+          <!-- Source list: the existing script keeps writing here. It is hidden once the structured view below is built. -->
           <ul id="advisoryAffected" class="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-700"><li>No affected products identified.</li></ul>
+          <div id="advisoryAffectedView" hidden></div>
         </article>
       </div>
-      <article class="mt-5 rounded-xl border-2 border-slate-900 p-5">
-        <h2 class="text-lg font-extrabold">Remediation actions</h2>
-        <ul id="advisoryActions" class="mt-3 list-decimal space-y-2 pl-5 text-sm text-slate-700"><li>Review the source document for recommended actions.</li></ul>
+
+      <article class="adv-card mt-5">
+        <h2 class="adv-card__title"><span class="adv-card__icon material-symbols-outlined" aria-hidden="true">checklist</span>Remediation actions</h2>
+        <!-- Source list: the existing script keeps writing here. It is hidden once the action-card view below is built. -->
+        <ul id="advisoryActions" class="mt-3 list-decimal space-y-2 pl-5 text-sm text-slate-700"><li>No remediation actions identified yet.</li></ul>
+        <div id="advisoryActionsView" hidden></div>
       </article>
-      <div class="mt-6 flex flex-wrap gap-3">
-        <a id="downloadAdvisory" href="#" class="inline-flex items-center justify-center rounded-full border-2 border-slate-900 bg-[#F0E6FF] px-5 py-3 text-sm font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">Download Official PDF Advisory</a>
-        <a href="/chat" class="inline-flex items-center justify-center rounded-full border-2 border-slate-900 bg-white px-5 py-3 text-sm font-bold">Transform another document</a>
+
+      <!-- [REPORT v2] 5. Footer action bar (ids, href and handlers unchanged) -->
+      <div class="adv-footer">
+        <div class="adv-footer__actions">
+          <a id="downloadAdvisory" href="#" class="adv-btn adv-btn--primary"><span class="material-symbols-outlined" aria-hidden="true">picture_as_pdf</span>Download Official PDF Advisory</a>
+          <a href="/chat" class="adv-btn adv-btn--secondary"><span class="material-symbols-outlined" aria-hidden="true">autorenew</span>Transform another document</a>
+        </div>
+        <p id="advisoryNotice" class="adv-notice" role="status"></p>
       </div>
-      <p id="advisoryNotice" class="mt-4 text-sm text-slate-600" role="status"></p>
     </section>
   </main>
   <script>
@@ -65,19 +223,47 @@
           target.appendChild(item);
         });
       };
+      const renderCves = (values) => {
+        const target = document.getElementById('advisoryCves');
+        if (!target) return;
+        target.replaceChildren();
+        if (!values.length) {
+          const empty = document.createElement('span');
+          empty.className = 'text-sm text-slate-500';
+          empty.textContent = 'No CVE identifiers identified in the source.';
+          target.appendChild(empty);
+          return;
+        }
+        values.forEach(value => {
+          const chip = document.createElement('span');
+          chip.className = 'rounded-full border-2 border-slate-900 bg-[#F0E6FF] px-3 py-1 text-xs font-bold text-slate-800';
+          chip.textContent = String(value);
+          target.appendChild(chip);
+        });
+      };
       try {
         const data = JSON.parse(sessionStorage.getItem('transformResult') || 'null');
         if (!data) {
           document.getElementById('advisoryNotice').textContent = 'No transformation found. Upload a document via Chat to generate this advisory.';
+          renderCves([]);
+          document.getElementById('downloadAdvisory').hidden = true;
           return;
         }
         const facts = data.canonical_facts || {};
-        const title = facts.title || data.title || 'Official Security Advisory';
+        const filename = data.filename || 'Uploaded Document';
+        const title = facts.title || data.title || filename;
+        const documentBadge = document.getElementById('sourceDocumentBadge');
+        if (documentBadge) documentBadge.textContent = filename;
+        const audienceBadge = document.getElementById('audienceBadge');
+        if (audienceBadge) audienceBadge.textContent = data.operator_config?.target_audience || data.target_audience || 'General';
+        const toneBadge = document.getElementById('toneBadge');
+        if (toneBadge) toneBadge.textContent = data.operator_config?.tone || data.tone || 'Professional';
         const cves = list(facts.cve_ids || facts.cve_id);
         document.getElementById('advisoryTitle').textContent = title;
         document.getElementById('advisoryReference').textContent = `Reference ID: ${cves.join(', ') || facts.advisory_id || 'Not identified'}`;
         document.getElementById('advisoryOverview').textContent = facts.summary || data.summary || 'No vulnerability overview was returned.';
         document.getElementById('advisorySeverity').textContent = facts.severity || facts.risk_level || 'Not available';
+        renderCves(cves);
         renderList('advisoryAffected', list(facts.affected_systems || facts.affected_products), 'No affected products identified in the source.');
         renderList('advisoryActions', list(facts.recommended_actions || facts.recommendations), 'No remediation action was identified in the source.');
         const pdfUrl = data.download_urls?.advisory_pdf;
@@ -94,6 +280,263 @@
         document.getElementById('advisoryNotice').textContent = 'Unable to read the saved transformation. Please return to Chat and try again.';
       }
     });
+  </script>
+  <script>
+    /* Additive severity classifier - appended after the existing render script; only toggles classes on #advisorySeverity */
+    (function () {
+      const sev = document.getElementById('advisorySeverity');
+      if (!sev) return;
+      const classes = ['sev-critical', 'sev-high', 'sev-medium', 'sev-low'];
+      const apply = () => {
+        const v = (sev.textContent || '').trim().toLowerCase();
+        const next = v.includes('critical') ? 'sev-critical'
+          : v.includes('high') ? 'sev-high'
+          : (v.includes('medium') || v.includes('moderate')) ? 'sev-medium'
+          : v.includes('low') ? 'sev-low'
+          : '';
+        classes.forEach(c => sev.classList.toggle(c, c === next));
+      };
+      apply();
+      new MutationObserver(apply).observe(sev, { childList: true, characterData: true, subtree: true });
+    })();
+  </script>
+  <script id="advisory-report-v2-js">
+    /* [REPORT v2] Additive presentation layer. Read-only with respect to the existing logic:
+       it never calls fetch, never touches the download href/handler, never writes to storage.
+       It re-skins what the existing render script already put in the DOM and re-runs when that DOM changes.
+       Each section is isolated in try/catch so a failure leaves the plain (original) content visible. */
+    (function () {
+      'use strict';
+      const $ = (id) => document.getElementById(id);
+      const txt = (el) => (el ? (el.textContent || '').trim() : '');
+      const make = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+      const icon = (name, cls) => { const s = make('span', 'material-symbols-outlined' + (cls ? ' ' + cls : ''), name); s.setAttribute('aria-hidden', 'true'); return s; };
+      const liTexts = (ul) => (ul ? Array.from(ul.children).filter((n) => n.tagName === 'LI').map(txt).filter(Boolean) : []);
+      const safe = (label, fn) => { try { return fn(); } catch (e) { console.warn('[advisory-report-v2] ' + label + ':', e); } };
+
+      /* ---------- data helpers (read-only view of the same payload the page already uses) ---------- */
+      const readFacts = () => {
+        try { const d = JSON.parse(sessionStorage.getItem('transformResult') || 'null'); return (d && d.canonical_facts) || {}; }
+        catch (_) { return {}; }
+      };
+      const asList = (v) => (Array.isArray(v) ? v : v ? [v] : [])
+        .map((x) => (x && typeof x === 'object' ? (x.name || x.label || x.title || '') : x))
+        .map((x) => String(x).trim()).filter(Boolean);
+      const pick = (facts, keys) => { for (const k of keys) { const l = asList(facts[k]); if (l.length) return l; } return []; };
+
+      const sevLevel = () => {
+        const v = txt($('advisorySeverity')).toLowerCase();
+        return v.includes('critical') ? 'critical' : v.includes('high') ? 'high'
+          : (v.includes('medium') || v.includes('moderate')) ? 'medium' : v.includes('low') ? 'low' : 'none';
+      };
+
+      /* ---------- 1. Reference ID -> monospace badge(s) ---------- */
+      const renderReference = () => {
+        const el = $('advisoryReference'); if (!el) return;
+        const raw = txt(el);
+        const m = /^Reference ID:\s*(.*)$/i.exec(raw);
+        const val = (m ? m[1] : raw).trim();
+        const ids = !val || /^not identified$/i.test(val) ? [] : val.split(/\s*,\s*/).filter(Boolean);
+        const frag = document.createDocumentFragment();
+        frag.appendChild(make('span', 'adv-ref__label', 'Reference ID'));
+        if (ids.length) ids.forEach((id) => frag.appendChild(make('code', 'adv-code', id)));
+        else frag.appendChild(make('span', 'adv-code is-empty', 'NOT IDENTIFIED'));
+        el.replaceChildren(frag);
+      };
+
+      /* ---------- 2. Overview keyword highlighting ---------- */
+      const VECTOR_TERMS = ['device-linking feature', 'device linking', 'linked devices', 'pairing code', 'social engineering', 'spear-phishing',
+        'phishing', 'zero-day', 'remote code execution', 'privilege escalation', 'account takeover', 'credential theft', 'ransomware',
+        'malware', 'qr code', 'man-in-the-middle', 'denial of service', 'sql injection', 'cross-site scripting', 'supply chain'];
+      const ci = (s) => s.replace(/[a-z]/gi, (c) => '[' + c.toLowerCase() + c.toUpperCase() + ']').replace(/ /g, '\\s+');
+      const KW_RE = new RegExp(
+        '(\\b[A-Z]{2,6}-\\d{4}-\\d{3,7}\\b)' +                                        // 1: advisory / CVE ids (CIAD-2025-0055, CVE-2025-1234)
+        '|(\\b(?:' + VECTOR_TERMS.slice().sort((a, b) => b.length - a.length).map(ci).join('|') + ')\\b)' + // 2: technical vectors
+        '|(\\b[A-Z][a-z]+(?:[A-Z][a-z0-9]+)+\\b)', 'g');                              // 3: CamelCase campaign names (GhostPairing)
+      const CAMEL_SKIP = new Set(['WhatsApp', 'GitHub', 'LinkedIn', 'PowerShell', 'JavaScript', 'TypeScript', 'OpenSSL', 'YouTube', 'UnifiOps', 'DevOps']);
+      const renderOverview = () => {
+        const el = $('advisoryOverview'); if (!el) return;
+        const raw = el.textContent || '';
+        if (/^\s*(Upload a document|No vulnerability overview)/i.test(raw)) { el.classList.add('adv-empty'); return; }
+        el.classList.remove('adv-empty');
+        const frag = document.createDocumentFragment();
+        let last = 0, m; KW_RE.lastIndex = 0;
+        while ((m = KW_RE.exec(raw))) {
+          if (m[3] && CAMEL_SKIP.has(m[3])) continue;
+          if (m.index > last) frag.appendChild(document.createTextNode(raw.slice(last, m.index)));
+          frag.appendChild(m[1] ? make('code', 'kw kw-id', m[0]) : make('span', m[2] ? 'kw kw-vector' : 'kw kw-campaign', m[0]));
+          last = m.index + m[0].length;
+        }
+        if (last < raw.length) frag.appendChild(document.createTextNode(raw.slice(last)));
+        el.replaceChildren(frag);
+      };
+
+      /* ---------- 3a. CVE badges (+ disabled empty state) ---------- */
+      const renderCves = () => {
+        const el = $('advisoryCves'); if (!el) return;
+        const values = Array.from(el.children).map(txt).filter((v) => v && !/^No CVE/i.test(v) && !/^NONE IDENTIFIED/i.test(v));
+        const frag = document.createDocumentFragment();
+        if (!values.length) {
+          const none = make('span', 'adv-code is-disabled', 'NONE IDENTIFIED (Zero-Day / Phishing Vector)');
+          none.setAttribute('aria-disabled', 'true');
+          frag.appendChild(none);
+        } else {
+          values.forEach((v) => {
+            if (/^CVE-\d{4}-\d{4,}$/i.test(v)) {
+              const a = make('a', 'adv-code', v);
+              a.href = 'https://nvd.nist.gov/vuln/detail/' + encodeURIComponent(v.toUpperCase());
+              a.target = '_blank'; a.rel = 'noopener noreferrer'; a.title = 'Open ' + v.toUpperCase() + ' in the NVD';
+              frag.appendChild(a);
+            } else frag.appendChild(make('span', 'adv-code', v));
+          });
+        }
+        el.replaceChildren(frag);
+      };
+
+      /* ---------- metrics strip (explicit facts first, light keyword inference second) ---------- */
+      const CATEGORY_RULES = [[/account (?:takeover|hijack)/i, 'Account Takeover'], [/social engineering/i, 'Social Engineering'], [/phishing/i, 'Phishing'],
+        [/ransomware/i, 'Ransomware'], [/remote code execution|\bRCE\b/i, 'Remote Code Execution'], [/privilege escalation/i, 'Privilege Escalation'],
+        [/denial[- ]of[- ]service|\bDoS\b/i, 'Denial of Service'], [/data (?:breach|leak|exfiltration)/i, 'Data Exposure'], [/malware/i, 'Malware']];
+      const VECTOR_RULES = [[/device[- ]linking|linked devices?|pairing (?:code|request)/i, 'Device-Linking'], [/phishing/i, 'Phishing'], [/qr[- ]code/i, 'QR Code'],
+        [/malicious (?:links?|urls?)|suspicious links?/i, 'Malicious Links'], [/malicious attachments?/i, 'Malicious Attachments'],
+        [/remote exploit|network[- ]based/i, 'Remote Exploit'], [/supply[- ]chain/i, 'Supply Chain']];
+      const BRANDS = ['WhatsApp', 'Meta', 'Microsoft', 'Windows', 'Linux', 'Android', 'iOS', 'macOS', 'Apple', 'Google', 'Chrome', 'Firefox', 'Cisco', 'VMware',
+        'Apache', 'Oracle', 'Fortinet', 'Citrix', 'Ivanti', 'Adobe', 'SAP', 'AWS', 'Azure', 'Kubernetes', 'Docker', 'Telegram', 'Signal'];
+      const inferRules = (rules, hay, max) => rules.filter(([re]) => re.test(hay)).map(([, label]) => label).slice(0, max);
+      const inferBrands = (hay) => BRANDS.map((b) => ({ b, i: hay.search(new RegExp('\\b' + b + '\\b')) })).filter((x) => x.i >= 0)
+        .sort((a, b) => a.i - b.i).map((x) => x.b).slice(0, 2);
+
+      const fillTile = (id, values, inferred) => {
+        const el = $(id); if (!el) return;
+        const frag = document.createDocumentFragment();
+        if (values.length) values.forEach((v) => {
+          const p = make('span', 'adv-pill' + (inferred ? ' is-inferred' : ''), v);
+          if (inferred) p.title = 'Inferred from the advisory text';
+          frag.appendChild(p);
+        });
+        else frag.appendChild(make('span', 'adv-pill is-empty', 'Not specified'));
+        el.replaceChildren(frag);
+      };
+
+      let platformGuess = '';
+      const renderMetrics = () => {
+        const facts = readFacts();
+        const hay = [txt($('advisoryTitle')), txt($('advisoryOverview')), ...liTexts($('advisoryAffected')), ...liTexts($('advisoryActions'))].join('\n');
+        const cat = pick(facts, ['threat_category', 'category', 'attack_type', 'threat_type', 'vulnerability_type', 'classification']);
+        const plat = pick(facts, ['target_platform', 'platform', 'target', 'vendor', 'product']);
+        const vec = pick(facts, ['execution_vectors', 'attack_vectors', 'attack_vector', 'vectors']);
+        const c = cat.length ? cat : inferRules(CATEGORY_RULES, hay, 2);
+        const p = plat.length ? plat : inferBrands(hay);
+        const v = vec.length ? vec : inferRules(VECTOR_RULES, hay, 3);
+        fillTile('advisoryCategory', c.slice(0, 3), !cat.length);
+        fillTile('advisoryPlatform', p.slice(0, 3), !plat.length);
+        fillTile('advisoryVectors', v.slice(0, 3), !vec.length);
+        platformGuess = p[0] || '';
+      };
+
+      /* ---------- 3b. Affected systems (icon rows + styled fallback) ---------- */
+      const sysIcon = (t) => /browser|chrome|firefox|edge|safari|extension/i.test(t) ? 'language'
+        : /web|desktop|windows|macos|linux|workstation/i.test(t) ? 'desktop_windows'
+        : /mobile|android|ios|iphone|phone|handset|client|app\b/i.test(t) ? 'smartphone'
+        : /server|cloud|api|database|backend|infrastructure|network|router|firewall/i.test(t) ? 'dns' : 'devices';
+      const renderAffected = () => {
+        const src = $('advisoryAffected'), view = $('advisoryAffectedView'); if (!src || !view) return;
+        const items = liTexts(src);
+        const frag = document.createDocumentFragment();
+        if (!items.length || (items.length === 1 && /^No affected/i.test(items[0]))) {
+          const box = make('div', 'adv-fallback');
+          const body = make('div');
+          body.append(make('strong', null, platformGuess ? 'All Supported ' + platformGuess + ' Instances (Cross-Platform)' : 'All Supported Instances (Cross-Platform)'),
+            make('small', null, 'No specific products were listed in the source, so exposure is treated as platform-wide.'));
+          box.append(icon('public'), body);
+          frag.appendChild(box);
+        } else {
+          const ul = make('ul', 'adv-syslist');
+          items.forEach((t) => {
+            const li = make('li', 'adv-sys');
+            const ic = icon(sysIcon(t), 'adv-sys__icon');
+            li.append(ic, make('span', null, t));
+            ul.appendChild(li);
+          });
+          frag.appendChild(ul);
+        }
+        view.replaceChildren(frag); view.hidden = false; src.hidden = true;
+      };
+
+      /* ---------- 4. Remediation: verb-led action cards + Immediate Action callout ---------- */
+      const LEAD_NUM = /^\s*(?:\d+[.)]|[-\u2022*])\s+/;
+      const MODS = '(?:(?:do not|don\'t|never|always|immediately|promptly|urgently|please|also)\\s+)*';
+      const VERB_RE = new RegExp('^(' + MODS + ')([A-Za-z][A-Za-z\'-]*)', 'i');
+      const URGENT_ANY = /\b(immediately|urgent(?:ly)?|critical|right away|as soon as possible|asap|emergency|without delay)\b/i;
+      const URGENT_LEAD = /^(?:do not|don't|never|immediately|reject|disable|revoke|isolate|block|patch|rotate|unlink|remove|terminate|quarantine|stop)\b/i;
+      const splitVerb = (t) => {
+        let m = /^([A-Za-z][A-Za-z' \/-]{1,28}?):\s+([\s\S]+)$/.exec(t);
+        if (m && m[1].trim().split(/\s+/).length <= 4) return { verb: m[1].trim(), rest: m[2].trim(), colon: true };
+        m = VERB_RE.exec(t);
+        return m ? { verb: m[0].trim(), rest: t.slice(m[0].length).trim(), colon: false } : { verb: '', rest: t, colon: false };
+      };
+      const actCard = (a) => {
+        const li = make('li', 'adv-act');
+        const p = make('p', 'adv-act__text');
+        if (a.verb) { p.appendChild(make('strong', 'act-verb', a.verb + (a.colon ? ':' : ''))); p.appendChild(document.createTextNode(a.rest ? ' ' + a.rest : '')); }
+        else p.textContent = a.rest;
+        li.append(make('span', 'adv-act__num', String(a.n)), p);
+        return li;
+      };
+      const actList = (arr) => { const ol = make('ol', 'adv-actgrid'); arr.forEach((a) => ol.appendChild(actCard(a))); return ol; };
+      const renderActions = () => {
+        const src = $('advisoryActions'), view = $('advisoryActionsView'); if (!src || !view) return;
+        const items = liTexts(src);
+        const frag = document.createDocumentFragment();
+        if (!items.length || (items.length === 1 && /^No remediation/i.test(items[0]))) {
+          const box = make('div', 'adv-fallback');
+          const body = make('div');
+          body.append(make('strong', null, 'No remediation actions identified'), make('small', null, items[0] || 'The source did not include recommended actions.'));
+          box.append(icon('pending_actions'), body);
+          frag.appendChild(box);
+        } else {
+          const acts = items.map((t, i) => Object.assign({ n: i + 1 }, splitVerb(t.replace(LEAD_NUM, ''))));
+          const text = (a) => (a.verb ? a.verb + ' ' : '') + a.rest;
+          let urgent = acts.filter((a) => URGENT_ANY.test(text(a)) || URGENT_LEAD.test(text(a)));
+          if (!urgent.length && /^(critical|high)$/.test(sevLevel())) urgent = acts.slice(0, 2);
+          urgent = urgent.slice(0, 3);
+          const rest = acts.filter((a) => urgent.indexOf(a) < 0);
+          if (urgent.length) {
+            const box = make('section', 'adv-callout');
+            box.setAttribute('aria-label', 'Immediate action required');
+            const head = make('div', 'adv-callout__head');
+            head.append(icon('warning', 'adv-callout__icon'), make('span', 'adv-callout__title', 'Immediate action required'), make('span', 'adv-callout__sub', 'Complete these first'));
+            box.append(head, actList(urgent));
+            frag.appendChild(box);
+            if (rest.length) { const more = make('div', 'adv-more'); more.append(make('p', 'adv-label', 'Additional recommended actions'), actList(rest)); frag.appendChild(more); }
+          } else frag.appendChild(actList(acts));
+        }
+        view.replaceChildren(frag); view.hidden = false; src.hidden = true;
+      };
+
+      /* ---------- orchestration ---------- */
+      const renderAll = () => {
+        const shell = $('advisoryShell'); if (shell) shell.dataset.sev = sevLevel();
+        safe('reference', renderReference);
+        safe('overview', renderOverview);
+        safe('cves', renderCves);
+        safe('metrics', renderMetrics);      // before affected: provides platformGuess for the fallback label
+        safe('affected', renderAffected);
+        safe('actions', renderActions);
+      };
+
+      const init = () => {
+        const targets = ['advisoryTitle', 'advisoryReference', 'advisoryOverview', 'advisorySeverity', 'advisoryCves', 'advisoryAffected', 'advisoryActions']
+          .map($).filter(Boolean);
+        const opts = { childList: true, characterData: true, subtree: true };
+        let pending = false;
+        const mo = new MutationObserver(() => { if (!pending) { pending = true; Promise.resolve().then(run); } });
+        const observeAll = () => targets.forEach((t) => mo.observe(t, opts));
+        function run() { pending = false; mo.disconnect(); try { renderAll(); } finally { observeAll(); } }
+        run();
+      };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+    })();
   </script>
 </body>
 </html>

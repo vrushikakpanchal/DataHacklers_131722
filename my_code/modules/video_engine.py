@@ -1,12 +1,33 @@
+"""Video blueprint generation, motion-script authoring, and optional MP4 rendering.
+
+The Ollama prompt and the normalization pass keep every scene grounded in the
+supplied source facts: scene count, titles, descriptions, voiceover copy,
+visuals, and timing are all derived from the input document, and no static
+scene template or hardcoded metric ever reaches the output.
+
+Each blueprint also carries a `motion_script` array (scene_id, heading, subtext,
+theme_severity, active_icon, animation_style, duration_seconds) that drives the
+client-side "Code-as-Motion" engine in html_frontend/05_video.html. That engine
+is the primary playback path, so the heavy render stack (moviepy, pyttsx3,
+numpy, Pillow) is imported lazily and the module stays importable without it.
+"""
+
 import os
 import json
 import tempfile
 import requests
-import pyttsx3
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont
-from moviepy import ImageClip, AudioFileClip, concatenate_videoclips, vfx, afx
 from modules.design_engine import infer_design
+
+try:  # Optional: only the offline MP4 renderer needs these heavyweight packages.
+    import pyttsx3
+    import numpy as np
+    from PIL import Image, ImageDraw, ImageFont
+    from moviepy import ImageClip, AudioFileClip, concatenate_videoclips, vfx, afx
+    HEAVY_RENDER_AVAILABLE = True
+except ImportError:  # Blueprint + motion-script generation must keep working regardless.
+    pyttsx3 = np = Image = ImageDraw = ImageFont = None
+    ImageClip = AudioFileClip = concatenate_videoclips = vfx = afx = None
+    HEAVY_RENDER_AVAILABLE = False
 
 OLLAMA_API_URL = "http://localhost:11434/api/generate"
 WIDTH = 1280
@@ -44,50 +65,393 @@ def _safe_draw(draw):
 # GENERATOR (Ollama Blueprint Generation)
 # ---------------------------------------------------------
 
+def _pick_text(*values) -> str:
+    """Return the first non-empty string among the given values."""
+    for value in values:
+        text = str(value or "").strip()
+        if text:
+            return text
+    return ""
+
+
+def _as_text_list(value) -> list:
+    """Normalize a scalar or sequence into a clean list of strings."""
+    if isinstance(value, str):
+        return [value.strip()] if value.strip() else []
+    if isinstance(value, (list, tuple)):
+        items = []
+        for item in value:
+            text = str(item or "").strip()
+            if text:
+                items.append(text)
+        return items
+    return []
+
+
+def _estimate_narration_seconds(text: str) -> float:
+    """Estimate spoken runtime (word count at ~2.5 words/second)."""
+    words = len(str(text or "").split())
+    return round(words / 2.5, 1) if words else 0.0
+
+
+def _coerce_seconds(value) -> float:
+    """Parse a declared duration into seconds; return 0.0 when absent or invalid."""
+    try:
+        return max(0.0, float(value))
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _facts_from_text(text: str) -> dict:
+    """Recover canonical fact fields when the input text is serialized facts JSON."""
+    try:
+        parsed = json.loads(text)
+    except (TypeError, ValueError):
+        return {}
+    if not isinstance(parsed, dict):
+        return {}
+    cve_ids = _as_text_list(parsed.get("cve_ids"))
+    for cve in _as_text_list(parsed.get("locked_cves")):
+        if cve not in cve_ids:
+            cve_ids.append(cve)
+    return {
+        "title": _pick_text(parsed.get("title")),
+        "severity": _pick_text(parsed.get("severity")),
+        "summary": _pick_text(parsed.get("summary")),
+        "cve_ids": cve_ids,
+        "affected_systems": _as_text_list(parsed.get("affected_systems")),
+        "locked_ips": _as_text_list(parsed.get("locked_ips")),
+        "recommended_actions": _as_text_list(parsed.get("recommended_actions")),
+    }
+
+
+def _format_facts_block(facts: dict) -> str:
+    """Render canonical facts as the authoritative bullet list for the prompt."""
+    lines = []
+    if facts.get("title"):
+        lines.append(f"- Title: {facts['title']}")
+    if facts.get("severity"):
+        lines.append(f"- Severity: {facts['severity']}")
+    if facts.get("cve_ids"):
+        lines.append(f"- CVE IDs: {', '.join(facts['cve_ids'])}")
+    if facts.get("affected_systems"):
+        lines.append(f"- Affected systems: {', '.join(facts['affected_systems'])}")
+    if facts.get("locked_ips"):
+        lines.append(f"- Locked indicator IPs: {', '.join(facts['locked_ips'])}")
+    if facts.get("summary"):
+        lines.append(f"- Summary: {facts['summary']}")
+    if facts.get("recommended_actions"):
+        lines.append("- Recommended actions:")
+        lines.extend(f"  {index}. {action}" for index, action in enumerate(facts["recommended_actions"], 1))
+    return "\n".join(lines)
+
+
+def _normalize_metrics(value) -> list:
+    """Normalize metric entries into labeled callouts, dropping anything empty."""
+    if not isinstance(value, (list, tuple)):
+        return []
+    metrics = []
+    for item in value:
+        if isinstance(item, dict):
+            label = _pick_text(item.get("label"), item.get("name"))
+            metric_value = _pick_text(item.get("value"), item.get("detail"))
+        else:
+            label, metric_value = "", _pick_text(item)
+        if label or metric_value:
+            metrics.append({"label": label or metric_value, "value": metric_value or label})
+    return metrics
+
+
+# Motion-script enums shared with the client-side engine in 05_video.html.
+_MOTION_SEVERITIES = ("critical", "warning", "info")
+_MOTION_ICONS = ("shield", "network", "lock", "user_analyst")
+_MOTION_STYLES = ("slide_in", "pulse_alert", "kinetic_zoom")
+
+
+def _map_severity_to_motion(severity: str) -> str:
+    """Collapse any source severity wording into the three-value motion theme enum."""
+    value = str(severity or "").lower()
+    if any(token in value for token in ("critical", "high", "severe")):
+        return "critical"
+    if any(token in value for token in ("medium", "moderate", "warning", "elevated")):
+        return "warning"
+    return "info"
+
+
+def _infer_motion_icon(*texts) -> str:
+    """Pick the scene icon from its own wording; defaults to the generic shield."""
+    blob = " ".join(str(text or "").lower() for text in texts)
+    if any(key in blob for key in ("credential", "password", "analyst", "operator", "account", "user")):
+        return "user_analyst"
+    if any(key in blob for key in ("encrypt", "ransom", "lock", "exfiltrat", "access")):
+        return "lock"
+    if any(key in blob for key in ("network", "traffic", "endpoint", "node", "server", "lateral", "ip")):
+        return "network"
+    return "shield"
+
+
+def _infer_motion_style(position: int, theme_severity: str, metrics: list) -> str:
+    """Deterministic animation style so scenes vary without random flicker."""
+    if position == 1:
+        return "slide_in"
+    if theme_severity == "critical":
+        return "pulse_alert"
+    if metrics:
+        return "kinetic_zoom"
+    return "slide_in"
+
+
+def _normalize_scene(raw, index: int):
+    """Convert one raw LLM scene into the grounded scene schema, or None if empty."""
+    if isinstance(raw, str):
+        raw = {"narration": raw} if raw.strip() else {}
+    if not isinstance(raw, dict):
+        return None
+
+    title = _pick_text(raw.get("title"), raw.get("on_screen_text"))
+    on_screen_text = _pick_text(raw.get("on_screen_text"), title)
+    narration = _pick_text(raw.get("narration"), raw.get("narration_text"), raw.get("voiceover"), raw.get("script"))
+    visual_prompt = _pick_text(raw.get("visual_prompt"), raw.get("visual_description"), raw.get("visual_recommendation"))
+    description = _pick_text(raw.get("description"), visual_prompt, narration)
+    if not any((title, narration, visual_prompt, description)):
+        return None
+
+    duration_seconds = _coerce_seconds(raw.get("duration_seconds", raw.get("duration")))
+    if duration_seconds <= 0:
+        duration_seconds = _estimate_narration_seconds(narration) or _estimate_narration_seconds(description)
+    duration_seconds = round(max(2.0, duration_seconds), 1)
+
+    scene = {
+        "scene_number": index,
+        "title": title,
+        "description": description,
+        "narration": narration,
+        "visual_prompt": visual_prompt,
+        "duration_seconds": duration_seconds,
+        "on_screen_text": on_screen_text,
+    }
+    intent = _pick_text(raw.get("intent"))
+    if intent:
+        scene["intent"] = intent
+    metrics = _normalize_metrics(raw.get("metrics") or raw.get("key_metrics"))
+    if metrics:
+        scene["metrics"] = metrics
+    actions = _as_text_list(raw.get("actions") or raw.get("key_actions") or raw.get("recommended_actions"))
+    if actions:
+        scene["actions"] = actions
+    key_points = _as_text_list(raw.get("key_points"))
+    if key_points:
+        scene["key_points"] = key_points
+
+    # Motion direction for the client-side engine; enum values are validated and
+    # anything unrecognised is re-derived from this scene's own grounded copy.
+    heading = _pick_text(raw.get("heading"), title, on_screen_text)
+    subtext = _pick_text(raw.get("subtext"), narration, description)
+    raw_theme = _pick_text(raw.get("theme_severity"), raw.get("severity")).lower()
+    raw_icon = _pick_text(raw.get("active_icon"), raw.get("icon")).lower().replace("-", "_").replace(" ", "_")
+    raw_style = _pick_text(raw.get("animation_style"), raw.get("animation")).lower().replace("-", "_").replace(" ", "_")
+    scene["scene_id"] = index
+    scene["heading"] = heading
+    scene["subtext"] = subtext
+    if raw_theme in _MOTION_SEVERITIES:
+        scene["theme_severity"] = raw_theme
+    elif raw_theme:
+        scene["theme_severity"] = _map_severity_to_motion(raw_theme)
+    else:
+        scene["theme_severity"] = ""
+    scene["active_icon"] = (
+        raw_icon if raw_icon in _MOTION_ICONS
+        else _infer_motion_icon(visual_prompt, description, narration, title)
+    )
+    scene["animation_style"] = raw_style if raw_style in _MOTION_STYLES else ""
+    return scene
+
+
+def _normalize_blueprint(raw, facts: dict, target_audience: str, tone: str,
+                         language: str, objective: str, style: str) -> dict:
+    """Validate the LLM blueprint and compose the fact-grounded output schema."""
+    if isinstance(raw, dict) and not isinstance(raw.get("scenes"), list):
+        # Tolerate one level of wrapping (e.g. {"blueprint": {"scenes": [...]}}).
+        for value in raw.values():
+            if isinstance(value, dict) and isinstance(value.get("scenes"), list):
+                raw = value
+                break
+    if not isinstance(raw, dict):
+        raise RuntimeError("Ollama returned a non-object JSON blueprint.")
+    if not isinstance(raw.get("scenes"), list):
+        raise RuntimeError("Ollama blueprint is missing a scenes list.")
+
+    scenes = []
+    for raw_scene in raw["scenes"]:
+        scene = _normalize_scene(raw_scene, len(scenes) + 1)
+        if scene:
+            scenes.append(scene)
+    if not scenes:
+        raise RuntimeError("Ollama blueprint did not contain any usable scene content.")
+
+    total_seconds = round(sum(scene["duration_seconds"] for scene in scenes), 1)
+    voiceover_script = " ".join(scene["narration"] for scene in scenes if scene["narration"]).strip()
+    # One visual prompt per scene, in order, so downstream consumers can index them against scenes.
+    visual_prompts = [scene["visual_prompt"] or scene["description"] or scene["title"] for scene in scenes]
+
+    # Client-side "Code-as-Motion" script: enum-validated per scene and backfilled
+    # from the blueprint severity, so partial or legacy payloads still animate.
+    fallback_theme = _map_severity_to_motion(_pick_text(raw.get("severity"), facts.get("severity")))
+    motion_script = []
+    for position, scene in enumerate(scenes, 1):
+        theme = scene.get("theme_severity") or fallback_theme
+        style = scene.get("animation_style") or _infer_motion_style(
+            position, theme, scene.get("metrics") or []
+        )
+        scene["scene_id"] = position
+        scene["theme_severity"] = theme
+        scene["animation_style"] = style
+        motion_script.append({
+            "scene_id": position,
+            "heading": _pick_text(scene.get("heading"), scene.get("title"), scene.get("on_screen_text")),
+            "subtext": _pick_text(scene.get("subtext"), scene.get("narration"), scene.get("description")),
+            "theme_severity": theme,
+            "active_icon": _pick_text(scene.get("active_icon")) or "shield",
+            "animation_style": style,
+            "duration_seconds": scene["duration_seconds"],
+        })
+
+    # Variety guard. Small local models tend to emit one enum value for every
+    # scene; when the reel has no variety at all, re-derive the motion direction
+    # from each scene's own grounded copy so the animation still changes shape.
+    # Anything the model did vary is left exactly as it chose.
+    if len(motion_script) >= 3:
+        if len({entry["animation_style"] for entry in motion_script}) == 1:
+            for position, entry in enumerate(motion_script, 1):
+                scene = scenes[position - 1]
+                style = _infer_motion_style(position, entry["theme_severity"], scene.get("metrics") or [])
+                entry["animation_style"] = style
+                scene["animation_style"] = style
+            if len({entry["animation_style"] for entry in motion_script}) == 1:
+                for position, entry in enumerate(motion_script, 1):
+                    style = _MOTION_STYLES[(position - 1) % len(_MOTION_STYLES)]
+                    entry["animation_style"] = style
+                    scenes[position - 1]["animation_style"] = style
+        if len({entry["active_icon"] for entry in motion_script}) == 1:
+            for position, entry in enumerate(motion_script, 1):
+                scene = scenes[position - 1]
+                icon = _infer_motion_icon(scene.get("visual_prompt"), scene.get("description"),
+                                          scene.get("narration"), scene.get("title"))
+                entry["active_icon"] = icon
+                scene["active_icon"] = icon
+
+    return {
+        "title": _pick_text(raw.get("title"), facts.get("title")),
+        "summary": _pick_text(raw.get("summary"), facts.get("summary")),
+        "severity": _pick_text(raw.get("severity"), facts.get("severity")),
+        "scenes": scenes,
+        "motion_script": motion_script,
+        "visual_prompts": visual_prompts,
+        "voiceover_script": voiceover_script,
+        "duration": f"{total_seconds:g}s",
+        "metadata": {
+            "source_title": _pick_text(facts.get("title"), raw.get("title")),
+            "severity": _pick_text(facts.get("severity"), raw.get("severity")),
+            "cve_ids": list(facts.get("cve_ids") or []),
+            "locked_ips": list(facts.get("locked_ips") or []),
+            "affected_systems": list(facts.get("affected_systems") or []),
+            "scene_count": len(scenes),
+            "total_duration_seconds": total_seconds,
+            "target_audience": target_audience,
+            "tone": tone,
+            "language": language,
+            "objective": objective,
+            "visual_style": style,
+        },
+    }
+
+
 def generate_video_blueprint(
     text: str,
     target_audience: str = "General",
     tone: str = "Informative",
     language: str = "English",
-    duration: str = "60s",
+    duration: str = "auto",
     objective: str = "Summarize threat advisory",
     style: str = "Cybersecurity Technical"
 ) -> dict:
     """
-    Sends the source document and video metadata to local Ollama (qwen2.5:3b)
-    to generate a structured video script JSON blueprint.
+    Sends the source facts to local Ollama (qwen2.5:3b) and returns a normalized,
+    fact-grounded video blueprint.
+
+    Scene count, titles, descriptions, voiceover copy, visuals, and timing are
+    derived from the input facts only; the returned structure is validated
+    before rendering so static template content never reaches the output.
     """
     text = text[:12000]
+    facts = _facts_from_text(text)
+    facts_block = _format_facts_block(facts)
+    auto_duration = str(duration).strip().lower() in ("auto", "none", "")
+    duration_guidance = (
+        "derive the total runtime strictly from the facts"
+        if auto_duration else f"aim for a total runtime near {duration}"
+    )
+    duration_rule = (
+        "The total runtime must follow from the facts; never force a preset length."
+        if auto_duration else f"Scale the scene plan so the total runtime lands close to {duration}."
+    )
 
     prompt = f"""You are an expert video producer and scriptwriter.
-Generate a structured video blueprint in valid JSON format based on the following input parameters and content.
+Plan a scene-by-scene video blueprint as valid JSON, derived strictly from the authoritative facts below.
 
 [Video Parameters]
 - Target Audience: {target_audience}
 - Tone: {tone}
 - Language: {language}
-- Duration: {duration}
+- Duration guidance: {duration_guidance}
 - Objective: {objective}
 - Visual Style: {style}
 
-[Source Document Content]
+[Authoritative Facts]
+{facts_block or "- No structured facts were provided; ground every statement in the raw source text below."}
+
+[Raw Source Text]
 {text}
 
-[JSON Format Requirements]
-Return ONLY a valid JSON object containing:
-1. "title": Video title string
-2. "summary": Brief executive summary string
-3. "scenes": A list of scene objects, where each scene object contains:
-   - "scene_number": Integer
-   - "intent": One of title_alert, attack_flow, metrics, mitigation, evidence_dashboard
-   - "on_screen_text": Short scene title
-   - "visual_description": Visual cues string
-   - "narration": Voiceover/narration text string
-   - "duration_seconds": Estimated duration integer
-   - "metrics": Optional list of source-backed {{"label": string, "value": string}} items; never invent numbers
-   - "actions": Optional list of source-backed mitigation steps
-   - "key_points": Optional list of concise, source-grounded visual callouts
-Every scene must have a distinct intent where the source supports it. Keep text brief enough for a 16:9 card.
+[Planning Rules]
+1. Scene count is dynamic: create exactly as many scenes as the facts require, one scene per distinct fact group (for example alert context, affected scope, impact, mitigations). Never pad with filler scenes and never merge unrelated facts into one scene.
+2. Every title, description, narration line, metric, action, and key point must be traceable to the authoritative facts. Never invent numbers, products, CVE IDs, IPs, or actions.
+3. Quote CVE IDs, severity values, and indicator IPs verbatim in the scenes that reference them.
+4. Write every field in {language}.
+5. Narration is speakable voiceover copy paced at roughly 2.5 words per second; set each scene's "duration_seconds" from its narration length.
+6. {duration_rule}
+7. Do not emit placeholder text, generic template labels, or repeated wording across scenes.
+8. If a field is not supported by the facts, omit it instead of guessing.
+9. Every scene must also carry motion direction for the client-side animation engine: "scene_id" (its 1-based position), "heading" (short on-screen headline, at most 8 words), "subtext" (one supporting on-screen sentence, at most 22 words), "theme_severity" (one of "critical", "warning", "info", matching the risk this scene presents), "active_icon" (one of "shield", "network", "lock", "user_analyst"), and "animation_style" (one of "slide_in", "pulse_alert", "kinetic_zoom").
+10. Pick "active_icon" from the scene subject, not from habit: "lock" for encryption, ransom, credential or access-abuse scenes; "network" for lateral movement, traffic, endpoints, servers or affected-scope scenes; "user_analyst" for human remediation, operator or recommended-action scenes; "shield" only for general defence or posture scenes. Never reuse the same "active_icon" on two consecutive scenes unless the subject is genuinely identical.
+11. Pick "animation_style" from the scene shape: "pulse_alert" for the highest-risk or active-exploitation scene, "kinetic_zoom" for scenes built around metrics, counts or impact numbers, and "slide_in" for everything else. Use at least two different styles across the reel.
+
+[Required JSON Schema]
+Return ONLY this JSON object:
+{{
+  "title": "video title grounded in the facts",
+  "summary": "executive summary grounded in the facts",
+  "scenes": [
+    {{
+      "scene_number": 1,
+      "scene_id": 1,
+      "heading": "short on-screen headline for this scene",
+      "subtext": "one supporting on-screen sentence",
+      "theme_severity": "critical",
+      "active_icon": "shield",
+      "animation_style": "slide_in",
+      "title": "short scene title",
+      "description": "what this scene communicates and why",
+      "narration": "voiceover script for this scene",
+      "visual_prompt": "visual direction for this scene",
+      "duration_seconds": 8,
+      "metrics": [{{"label": "fact label", "value": "fact value"}}],
+      "actions": ["source-backed mitigation step"],
+      "key_points": ["concise source-grounded callout"]
+    }}
+  ]
+}}
+"metrics", "actions", and "key_points" are optional per scene; include them only when the facts support them. "scene_id", "heading", "subtext", "theme_severity", "active_icon", and "animation_style" are required on every scene and must use only the enum values listed above.
 """
 
     payload = {
@@ -119,11 +483,19 @@ Every scene must have a distinct intent where the source supports it. Keep text 
     try:
         res_data = response.json()
         raw_response = res_data.get("response", "{}")
-        result = json.loads(raw_response)
+        raw_blueprint = json.loads(raw_response)
     except (json.JSONDecodeError, KeyError) as e:
         raise RuntimeError(f"Failed to parse JSON response from Ollama: {e}")
 
-    return result
+    return _normalize_blueprint(
+        raw_blueprint,
+        facts,
+        target_audience=_pick_text(target_audience, "General"),
+        tone=_pick_text(tone, "Informative"),
+        language=_pick_text(language, "English"),
+        objective=_pick_text(objective, "Summarize threat advisory"),
+        style=_pick_text(style, "Cybersecurity Technical"),
+    )
 
 
 # ---------------------------------------------------------
@@ -209,216 +581,132 @@ def draw_wrapped_text(
 # VISUAL SCENE DRAWING FUNCTIONS
 # ---------------------------------------------------------
 
-def draw_india_visual(draw):
-    draw = _safe_draw(draw)
-    points = [
-        (500, 275), (555, 250), (610, 265), (650, 300), (690, 325),
-        (675, 365), (650, 400), (625, 440), (610, 490), (585, 535),
-        (565, 500), (550, 455), (525, 420), (500, 380), (475, 345), (460, 310)
-    ]
-    draw.polygon(points, fill=(35, 75, 120), outline=(80, 170, 255))
-
-    locations = [(540, 315), (590, 350), (620, 390), (575, 430), (600, 470)]
-    for x, y in locations:
-        draw.ellipse((x - 9, y - 9, x + 9, y + 9), fill=(255, 70, 70))
-        draw.ellipse((x - 17, y - 17, x + 17, y + 17), outline=(255, 100, 100), width=2)
-
-    draw.text(
-        (455, 550),
-        "RANSOMWARE ACTIVITY",
-        font=get_font(24, bold=True),
-        fill=(255, 100, 100)
-    )
+# Layout numbers pick a drawing frame only; every embedded copy is scene-derived.
+_LEGACY_INTENT_LAYOUTS = {
+    "title_alert": 1, "alert": 1, "opening": 1,
+    "attack_flow": 2, "data_flow": 2, "architecture": 2,
+    "metrics": 3, "metric_highlights": 3, "impact_metrics": 3,
+    "mitigation": 4, "actions": 4, "response_steps": 4,
+    "evidence_dashboard": 5, "evidence": 5, "summary": 5,
+}
 
 
-def draw_vm_visual(draw):
-    draw = _safe_draw(draw)
-    draw.rounded_rectangle(
-        (400, 270, 850, 475),
-        radius=20,
-        fill=(24, 42, 65),
-        outline=(70, 150, 230),
-        width=3
-    )
-    draw.text(
-        (440, 300),
-        "VIRTUAL MACHINE",
-        font=get_font(32, bold=True),
-        fill=(110, 190, 255)
-    )
-
-    for y in [355, 405]:
-        draw.rounded_rectangle((450, y, 800, y + 30), radius=8, fill=(40, 60, 85))
-        draw.ellipse((470, y + 8, 482, y + 20), fill=(80, 220, 130))
-
-    draw.polygon([(900, 300), (965, 420), (835, 420)], fill=(210, 55, 55))
-    draw.text((890, 340), "!", font=get_font(60, bold=True), fill="white")
+def _scene_text_items(scene: dict, *keys) -> list:
+    """Collect the first non-empty list of clean strings among the scene keys."""
+    for key in keys:
+        items = _as_text_list(scene.get(key))
+        if items:
+            return items
+    return []
 
 
-def draw_terminal_visual(draw):
-    draw = _safe_draw(draw)
-    draw.rounded_rectangle(
-        (350, 245, 930, 475),
-        radius=12,
-        fill=(8, 12, 18),
-        outline=(70, 150, 230),
-        width=3
-    )
-    draw.rectangle((350, 245, 930, 285), fill=(30, 45, 65))
-    draw.ellipse((370, 258, 382, 270), fill=(220, 80, 80))
-    draw.ellipse((390, 258, 402, 270), fill=(230, 180, 60))
-    draw.ellipse((410, 258, 422, 270), fill=(70, 190, 100))
-
-    terminal_font = get_font(25)
-    commands = [
-        "PS C:\\System>",
-        "Get-Process",
-        "Get-Service",
-        "Invoke-Command",
-        "Access granted..."
-    ]
-
-    y = 305
-    for command in commands:
-        draw.text((390, y), command, font=terminal_font, fill=(100, 220, 150))
-        y += 32
-
-
-def draw_server_visual(draw):
-    draw = _safe_draw(draw)
-    server_positions = [(300, 275), (520, 275), (740, 275)]
-    labels = ["DATABASE", "ESXi", "NAS"]
-
-    for (x, y), label in zip(server_positions, labels):
-        draw.rounded_rectangle(
-            (x, y, x + 170, y + 210),
-            radius=15,
-            fill=(25, 43, 65),
-            outline=(70, 150, 230),
-            width=3
-        )
-        draw.text(
-            (x + 25, y + 25),
-            label,
-            font=get_font(24, bold=True),
-            fill=(110, 190, 255)
-        )
-
-        for row in range(3):
-            draw.rectangle(
-                (x + 30, y + 75 + row * 38, x + 140, y + 100 + row * 38),
-                fill=(45, 65, 90)
-            )
-            draw.ellipse(
-                (x + 40, y + 82 + row * 38, x + 52, y + 94 + row * 38),
-                fill=(80, 220, 130)
-            )
-
-    draw.polygon([(570, 500), (630, 590), (510, 590)], fill=(220, 60, 60))
-    draw.text((555, 515), "!", font=get_font(45, bold=True), fill="white")
-
-
-def draw_security_visual(draw):
-    draw = _safe_draw(draw)
-    draw.rounded_rectangle(
-        (350, 240, 930, 470),
-        radius=15,
-        fill=(18, 32, 50),
-        outline=(70, 150, 230),
-        width=3
-    )
-
-    for i in range(4):
-        y = 290 + i * 38
-        draw.rectangle((400, y, 850, y + 15), fill=(40, 65, 90))
-        draw.rectangle((400, y, 620 + i * 40, y + 15), fill=(70, 180, 130))
-
-    draw.text(
-        (400, 425),
-        "THREAT INTELLIGENCE",
-        font=get_font(25, bold=True),
-        fill=(110, 190, 255)
-    )
-
-    shield = [
-        (1000, 260), (1080, 290), (1060, 430),
-        (1000, 490), (940, 430), (920, 290)
-    ]
-    draw.polygon(shield, fill=(35, 130, 90), outline=(100, 230, 170))
-    draw.line([(955, 370), (985, 405), (1050, 335)], fill="white", width=12)
+def _scene_metrics(scene: dict) -> list:
+    """Collect (label, value) metric callouts from the scene, ignoring empties."""
+    callouts = []
+    for metric in scene.get("metrics") or scene.get("key_metrics") or []:
+        if isinstance(metric, dict):
+            label = _pick_text(metric.get("label"), metric.get("name"))
+            value = _pick_text(metric.get("value"), metric.get("detail"))
+        else:
+            label, value = "", _pick_text(metric)
+        if label or value:
+            callouts.append((label, value or label))
+    return callouts
 
 
 def draw_scene_visual(draw, scene: dict):
-    """Draw a distinct, content-aware scene template using a dark visual canvas."""
+    """Draw a scene visual frame whose layout and copy both come from the scene."""
     draw = _safe_draw(draw)
-    n = int(scene.get("scene_number", 1))
-    intent = str(scene.get("intent", "")).lower().replace("-", "_").replace(" ", "_")
-    intent_templates = {
-        "title_alert": 1, "alert": 1, "opening": 1,
-        "attack_flow": 2, "data_flow": 2, "architecture": 2,
-        "metrics": 3, "metric_highlights": 3, "impact_metrics": 3,
-        "mitigation": 4, "actions": 4, "response_steps": 4,
-        "evidence_dashboard": 5, "evidence": 5, "summary": 5,
-    }
-    n = intent_templates.get(intent, n)
-    visual_text = " ".join(str(scene.get(key, "")) for key in ("visual_description", "visual_recommendation", "on_screen_text", "narration")).lower()
     palette = (scene.get("_design") or {}).get("palette", {})
     theme_accent = palette.get("accent")
+    visual_text = " ".join(
+        str(scene.get(key, "")) for key in (
+            "visual_prompt", "visual_description", "visual_recommendation",
+            "on_screen_text", "title", "description", "narration",
+        )
+    ).lower()
     accent = tuple(int(theme_accent[i:i+2], 16) for i in (1, 3, 5)) if isinstance(theme_accent, str) and len(theme_accent) == 7 else ((66, 220, 207) if any(x in visual_text for x in ("finance", "revenue", "market", "budget")) else (255, 83, 93))
     blue, panel, ink = (77, 150, 235), (19, 35, 55), (224, 236, 248)
-    if n == 1:
-        # Alert/title template with a high contrast signal marker.
+
+    headline = _pick_text(scene.get("title"), scene.get("on_screen_text"))
+    metrics = _scene_metrics(scene)
+    actions = _scene_text_items(scene, "actions", "key_actions", "recommended_actions")
+    points = _scene_text_items(scene, "key_points")
+    intent = str(scene.get("intent", "")).lower().replace("-", "_").replace(" ", "_")
+
+    # Layout priority: legacy intent hint first (older blueprints), then scene content.
+    layout = _LEGACY_INTENT_LAYOUTS.get(intent)
+    if layout is None:
+        if metrics:
+            layout = 3
+        elif actions:
+            layout = 4
+        elif len(points) >= 2:
+            layout = 2
+        elif int(scene.get("scene_number", 1) or 1) == 1:
+            layout = 1
+        else:
+            layout = 5
+    if layout == 1 and not headline:
+        layout = 5
+    elif layout == 2 and len(points or actions) < 2:
+        layout = 5
+    elif layout == 3 and not metrics:
+        layout = 5
+    elif layout == 4 and not actions:
+        layout = 5
+
+    if layout == 1:
+        # Alert/title frame with a high-contrast signal marker and the scene headline.
         draw.rounded_rectangle((760, 205, 1150, 485), radius=34, fill=(38, 24, 37), outline=accent, width=4)
         draw.polygon([(955, 242), (1095, 438), (815, 438)], fill=accent)
         draw.text((916, 300), "!", font=get_font(112, True), fill="white")
         draw.rounded_rectangle((130, 280, 665, 405), radius=24, fill=panel, outline=blue, width=3)
-        draw.text((180, 315), "ALERT  /  BRIEFING", font=get_font(38, True), fill=ink)
-    elif n == 2:
-        # Attack/data flow diagram: segmented nodes connected by directional paths.
-        labels = ["SOURCE", "VECTOR", "IMPACT"]
-        for i, label in enumerate(labels):
-            x = 125 + i * 390
-            draw.rounded_rectangle((x, 285, x+275, 440), radius=22, fill=panel, outline=accent if i == 1 else blue, width=4)
-            draw.ellipse((x+102, 230, x+172, 300), fill=accent if i == 1 else blue)
-            draw.text((x+35, 345), label, font=get_font(30, True), fill=ink)
-            if i < 2:
-                draw.line((x+280, 365, x+365, 365), fill=accent, width=8)
-                draw.polygon([(x+365, 350), (x+395, 365), (x+365, 380)], fill=accent)
-    elif n == 3:
-        # Oversized metric callouts and compact indicator chips.
-        metrics = scene.get("metrics") or scene.get("key_metrics") or []
-        callouts = [(str(m.get("label") or "SOURCE METRIC"), str(m.get("value") or "Not specified")) if isinstance(m, dict) else ("SOURCE DETAIL", str(m)) for m in metrics[:3]]
-        if not callouts:
-            callouts = [("KEY SIGNAL", point) for point in (scene.get("key_points") or [])[:3]]
-        if not callouts:
-            callouts = [("SOURCE METRIC", "No quantitative metric supplied")]
-        for i, (label, value) in enumerate(callouts):
-            x = 95 + i*400
-            draw.rounded_rectangle((x, 250, x+350, 465), radius=28, fill=panel, outline=accent if i == 0 else blue, width=4)
+        headline_font = get_font(34, True)
+        for line_index, line in enumerate(_fit_text_lines(draw, headline, headline_font, 470, 2)):
+            draw.text((180, 312 + line_index * 40), line, font=headline_font, fill=ink)
+    elif layout == 2:
+        # Flow frame: one node per derived key point or action.
+        nodes = (points or actions)[:3]
+        span = 1080 - 275
+        for i, node in enumerate(nodes):
+            x = 125 + (i * span // (len(nodes) - 1) if len(nodes) > 1 else 0)
+            draw.rounded_rectangle((x, 285, x + 275, 440), radius=22, fill=panel, outline=accent if i == 0 else blue, width=4)
+            draw.ellipse((x + 102, 230, x + 172, 300), fill=accent if i == 0 else blue)
+            node_font = get_font(24 if len(node) > 56 else 28, True)
+            for line_index, line in enumerate(_fit_text_lines(draw, node, node_font, 215, 2)):
+                draw.text((x + 30, 330 + line_index * 36), line, font=node_font, fill=ink)
+            if i < len(nodes) - 1:
+                tip = x + 275
+                draw.line((tip + 8, 362, tip + 88, 362), fill=accent, width=8)
+                draw.polygon([(tip + 88, 347), (tip + 118, 362), (tip + 88, 377)], fill=accent)
+    elif layout == 3:
+        # Metric callouts sized to the sourced values.
+        for i, (label, value) in enumerate(metrics[:3]):
+            x = 95 + i * 400
+            draw.rounded_rectangle((x, 250, x + 350, 465), radius=28, fill=panel, outline=accent if i == 0 else blue, width=4)
             font_size = max(23, min(40, int(290 / max(1, len(value) / 18))))
-            wrapped = _fit_text_lines(draw, value, get_font(font_size, True), 295, 3)
-            for line_index, line in enumerate(wrapped):
-                draw.text((x+24, 292+line_index*48), line, font=get_font(font_size, True), fill=accent if i == 0 else ink)
-            draw.text((x+24, 420), label[:24].upper(), font=get_font(18, True), fill=blue)
-    elif n == 4:
-        # Mitigation checklist and progress rail.
-        actions = scene.get("actions") or scene.get("recommended_actions") or []
-        actions = [str(a) for a in actions[:4]] or ["Identify affected assets", "Apply mitigations", "Validate recovery"]
+            for line_index, line in enumerate(_fit_text_lines(draw, value, get_font(font_size, True), 295, 3)):
+                draw.text((x + 24, 292 + line_index * 48), line, font=get_font(font_size, True), fill=accent if i == 0 else ink)
+            if label and label != value:
+                draw.text((x + 24, 420), label[:24].upper(), font=get_font(18, True), fill=blue)
+    elif layout == 4:
+        # Checklist frame: one sourced action per row.
         draw.rounded_rectangle((210, 220, 1080, 500), radius=26, fill=panel, outline=blue, width=3)
-        for i, action in enumerate(actions):
-            y = 265 + i*55
-            draw.ellipse((255, y, 285, y+30), fill=accent)
-            draw.line((263, y+15, 271, y+23, 281, y+8), fill=(255,255,255), width=3)
-        fit_font = get_font(20 if len(action) > 74 else 23)
-        for line_index, line in enumerate(_fit_text_lines(draw, action, fit_font, 700, 2)):
-            draw.text((315, y-3+line_index*25), line, font=fit_font, fill=ink)
+        for i, action in enumerate(actions[:4]):
+            y = 265 + i * 55
+            draw.ellipse((255, y, 285, y + 30), fill=accent)
+            draw.line((263, y + 15, 271, y + 23, 281, y + 8), fill=(255, 255, 255), width=3)
+            action_font = get_font(20 if len(action) > 74 else 23)
+            for line_index, line in enumerate(_fit_text_lines(draw, action, action_font, 700, 2)):
+                draw.text((315, y - 3 + line_index * 25), line, font=action_font, fill=ink)
     else:
-        # Evidence/security dashboard template for remaining scenes.
+        # Neutral dashboard frame with no embedded copy.
         draw.rounded_rectangle((170, 220, 1110, 490), radius=26, fill=panel, outline=blue, width=3)
         for i, width in enumerate((680, 500, 750, 430)):
-            y = 275 + i*48
-            draw.rounded_rectangle((255, y, 255+width, y+18), radius=8, fill=(39, 59, 83))
-            draw.rounded_rectangle((255, y, 255+int(width*(.48+.12*(i%3))), y+18), radius=8, fill=accent if i == 0 else blue)
+            y = 275 + i * 48
+            draw.rounded_rectangle((255, y, 255 + width, y + 18), radius=8, fill=(39, 59, 83))
+            draw.rounded_rectangle((255, y, 255 + int(width * (.48 + .12 * (i % 3))), y + 18), radius=8, fill=accent if i == 0 else blue)
         draw.ellipse((920, 265, 1020, 365), fill=(29, 108, 91), outline=(76, 211, 166), width=4)
         draw.line((945, 315, 970, 338, 1001, 292), fill="white", width=9)
 
@@ -523,6 +811,12 @@ def _generate_narration_audio(text: str, output_path: str) -> None:
 
 def create_video(blueprint: dict, output_path: str = "sample_video.mp4") -> str:
     """Render scene images, synthesize narration, and stitch an MP4 with audio."""
+    if not HEAVY_RENDER_AVAILABLE:
+        raise RuntimeError(
+            "Local MP4 render dependencies (moviepy, pyttsx3, numpy, Pillow) are not "
+            "installed. Serve the blueprint's motion_script to the client-side "
+            "Code-as-Motion engine instead."
+        )
     scene_dir = os.path.join("output", "video_scenes")
     os.makedirs(scene_dir, exist_ok=True)
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
@@ -547,7 +841,16 @@ def create_video(blueprint: dict, output_path: str = "sample_video.mp4") -> str:
                 audio_durations[number] = measured.duration
                 measured.close()
 
-        scene_durations = [max(1.0, float(scene.get("duration_seconds", 5)), audio_durations.get(scene["scene_number"], 0.0)) for scene in scenes]
+        # Scene timing comes from declared durations, narration length, and measured audio.
+        scene_durations = [
+            max(
+                1.0,
+                _coerce_seconds(scene.get("duration_seconds")),
+                _estimate_narration_seconds(scene.get("narration") or scene.get("narration_text") or ""),
+                audio_durations.get(scene["scene_number"], 0.0),
+            )
+            for scene in scenes
+        ]
         transition = min(0.45, max(0.0, min(scene_durations) / 5)) if len(scenes) > 1 else 0.0
         total_duration = sum(scene_durations) - transition * max(0, len(scenes)-1)
         elapsed_before = 0.0
@@ -609,19 +912,26 @@ def create_video(blueprint: dict, output_path: str = "sample_video.mp4") -> str:
 
 
 def process_video_transformation(canonical_facts, output_dir="data/outputs"):
-    """Build a video from canonical facts and return its blueprint and path."""
+    """Build a fact-grounded video from canonical facts and return its blueprint and path."""
     os.makedirs(output_dir, exist_ok=True)
     if isinstance(canonical_facts, dict):
         source_text = json.dumps(canonical_facts, ensure_ascii=False, indent=2)
+        target_audience = _pick_text(canonical_facts.get("target_audience"), "General Public")
+        tone = _pick_text(canonical_facts.get("tone"), "Informative")
     else:
         source_text = str(canonical_facts)
+        target_audience, tone = "General Public", "Informative"
 
     blueprint = generate_video_blueprint(
         text=source_text,
-        target_audience="General Public",
-        tone="Informative",
-        duration="60s"
+        target_audience=target_audience,
+        tone=tone,
+        duration="auto"
     )
-    video_path = os.path.join(output_dir, "generated_advisory.mp4")
-    create_video(blueprint, output_path=video_path)
+    # The motion_script inside the blueprint is always returned; the MP4 is an
+    # optional extra that only renders where the heavyweight stack is installed.
+    video_path = None
+    if HEAVY_RENDER_AVAILABLE:
+        video_path = os.path.join(output_dir, "generated_advisory.mp4")
+        create_video(blueprint, output_path=video_path)
     return {"blueprint": blueprint, "video_path": video_path}

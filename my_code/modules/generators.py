@@ -99,12 +99,27 @@ def generate_summary(
     content_style: str = "Corporate",
 ) -> str:
     """Generate an executive summary using operator-selected output settings."""
+    system_prompt = (
+        "You are a technical content summarizer. Rules:\n"
+        "1. Every statement must be directly supported by the provided source text; never add outside knowledge or assumptions.\n"
+        "2. Never emit placeholders or mock content: no bracketed slots such as [insert X] or <TBD>, no 'Lorem ipsum', "
+        "no example or sample figures such as 'XX%', and no invented numbers, percentages, dates, CVE IDs, IP addresses, "
+        "product names, vendor claims, or statistics. If the source does not state something, omit it instead of guessing.\n"
+        "3. Reproduce all technical identifiers (CVE IDs, IP addresses, product names, version numbers) exactly as written in the source.\n"
+        "4. Output only the requested summary content; do not mention these rules, the source text, or the process."
+    )
     prompt = (
         f"Write in {language}. Detail level: {detail_level}. Objective: {objective}. "
-        f"Content style: {content_style}. Preserve technical facts and identifiers. "
-        f"Provide an executive summary with key findings and impact from this text:\n\n{text}"
+        f"Content style: {content_style}. Provide an executive summary of key findings and impact "
+        f"using only the source text below.\n\nSOURCE TEXT:\n{text}"
     )
-    response = ollama.chat(model=model_name, messages=[{'role': 'user', 'content': prompt}])
+    response = ollama.chat(
+        model=model_name,
+        messages=[
+            {'role': 'system', 'content': system_prompt},
+            {'role': 'user', 'content': prompt},
+        ],
+    )
     return response['message']['content']
 
 
@@ -149,7 +164,83 @@ def generate_report(
 # ---------------------------------------------------------
 # 2. Executive Brief & PDF Advisory Generator
 # ---------------------------------------------------------
+_SEVERITY_COLORS = {"CRITICAL": "#B42332", "HIGH": "#D14B3F", "MEDIUM": "#D28A25", "LOW": "#34866D"}
+
+
+def _fact_items(value: Any) -> list[str]:
+    """Normalize an optional fact field into a list of non-empty strings."""
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple, set)):
+        return [str(item).strip() for item in value if str(item).strip()]
+    text = str(value).strip()
+    return [text] if text else []
+
+
+def _fact_headline(facts: Dict[str, Any], limit: int = 90) -> str:
+    """Derive a document headline strictly from supplied facts."""
+    for key in ("title", "topic", "category", "content_type"):
+        items = _fact_items(facts.get(key))
+        if items:
+            return items[0][:limit].rstrip()
+    summary = " ".join(_fact_items(facts.get("summary")))
+    if summary:
+        if len(summary) > limit:
+            return summary[:limit].rsplit(" ", 1)[0].rstrip(" ,;:-") + "…"
+        return summary
+    return "Advisory"
+
+
 def generate_pdf_advisory(canonical_facts: Dict[str, Any]) -> str:
+    """Render the advisory as HTML/PDF using only the supplied canonical facts."""
+    facts = canonical_facts or {}
+    title = escape(_fact_headline(facts))
+    summary = " ".join(_fact_items(facts.get("summary")))
+    cves = _fact_items(facts.get("cve_ids") or facts.get("cve_id"))
+    systems = _fact_items(facts.get("affected_systems") or facts.get("affected_products"))
+    ips = _fact_items(facts.get("locked_ips"))
+    actions = _fact_items(
+        facts.get("recommended_actions") or facts.get("recommendations") or facts.get("mitigation_steps") or facts.get("key_points")
+    )
+    severities = _fact_items(facts.get("severity") or facts.get("risk_level"))
+    severity = severities[0].upper() if severities else ""
+
+    severity_html = ""
+    if severity:
+        badge_color = _SEVERITY_COLORS.get(severity, "#4A5568")
+        severity_html = f'<p><strong>Severity:</strong> <span class="badge" style="background-color: {badge_color};">{escape(severity)}</span></p>'
+
+    summary_section = ""
+    if summary:
+        summary_section = f"""
+        <div class="section">
+            <div class="section-title">Executive Summary</div>
+            <p>{escape(summary)}</p>
+        </div>"""
+
+    indicator_rows = []
+    if cves:
+        indicator_rows.append(f'<p><strong>Associated CVEs:</strong> {escape(", ".join(cves))}</p>')
+    if systems:
+        indicator_rows.append(f'<p><strong>Affected Systems:</strong> {escape(", ".join(systems))}</p>')
+    if ips:
+        indicator_rows.append(f'<p><strong>Locked IP Addresses:</strong></p><div class="code-box">{escape(", ".join(ips))}</div>')
+    indicators_section = ""
+    if indicator_rows:
+        indicators_section = f"""
+        <div class="section">
+            <div class="section-title">Identified Vulnerabilities & Technical Indicators</div>
+            {"".join(indicator_rows)}
+        </div>"""
+
+    mitigations_section = ""
+    if actions:
+        mitigations_section = f"""
+        <div class="section">
+            <div class="section-title">Recommended Mitigations</div>
+            <ul>{''.join(f'<li>{escape(str(action))}</li>' for action in actions)}</ul>
+        </div>"""
+
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -167,29 +258,12 @@ def generate_pdf_advisory(canonical_facts: Dict[str, Any]) -> str:
     </head>
     <body>
         <div class="header">
-            <div class="title">{canonical_facts.get('title', 'CYBERSECURITY ADVISORY')}</div>
-            <p><strong>Severity:</strong> <span class="badge">{canonical_facts.get('severity', 'UNKNOWN')}</span></p>
+            <div class="title">{title}</div>
+            {severity_html}
         </div>
-        
-        <div class="section">
-            <div class="section-title">Executive Summary</div>
-            <p>{canonical_facts.get('summary', 'No summary available.')}</p>
-        </div>
-
-        <div class="section">
-            <div class="section-title">Identified Vulnerabilities & Technical Indicators</div>
-            <p><strong>Associated CVEs:</strong> {', '.join(canonical_facts.get('cve_ids', []))}</p>
-            <p><strong>Affected Systems:</strong> {', '.join(canonical_facts.get('affected_systems', []))}</p>
-            <p><strong>Locked IP Addresses:</strong></p>
-            <div class="code-box">{', '.join(canonical_facts.get('locked_ips', []))}</div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">Recommended Mitigations</div>
-            <ul>
-                {''.join([f'<li>{action}</li>' for action in canonical_facts.get('recommended_actions', [])])}
-            </ul>
-        </div>
+        {summary_section}
+        {indicators_section}
+        {mitigations_section}
     </body>
     </html>
     """
@@ -646,121 +720,174 @@ def generate_video_package(canonical_facts: Dict[str, Any], model_name: str = "q
 # ---------------------------------------------------------
 # 6. Infographic Blueprint Generator (.svg)
 # ---------------------------------------------------------
-def _generate_infographic_svg_legacy(canonical_facts: Dict[str, Any]) -> str:
-    severity = canonical_facts.get('severity', 'CRITICAL')
-    cves = ', '.join(canonical_facts.get('cve_ids', []))
-    ips = ', '.join(canonical_facts.get('locked_ips', []))
-    actions = canonical_facts.get('recommended_actions', ['Apply patches immediately'])
-    
-    action_items_xml = ""
-    for idx, act in enumerate(actions[:3]):
-        action_items_xml += f'<text x="40" y="{260 + idx * 30}" font-family="Arial" font-size="14" fill="#2D3748">• {act[:65]}</text>\n'
-
-    svg_content = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="100%">
-        <!-- Background -->
-        <rect width="800" height="400" fill="#F7FAFC" rx="10"/>
-        
-        <!-- Header Banner -->
-        <rect width="800" height="70" fill="#1A365D" rx="10"/>
-        <text x="30" y="45" font-family="Arial" font-size="22" font-weight="bold" fill="#FFFFFF">{canonical_facts.get('title', 'SECURITY ALERT')[:50]}</text>
-        
-        <!-- Severity Card -->
-        <rect x="30" y="90" width="220" height="100" fill="#FFF5F5" stroke="#E53E3E" stroke-width="2" rx="8"/>
-        <text x="45" y="120" font-family="Arial" font-size="14" fill="#C53030" font-weight="bold">SEVERITY RATING</text>
-        <text x="45" y="160" font-family="Arial" font-size="28" fill="#E53E3E" font-weight="bold">{severity}</text>
-        
-        <!-- CVE Card -->
-        <rect x="270" y="90" width="240" height="100" fill="#EBF8FF" stroke="#3182CE" stroke-width="2" rx="8"/>
-        <text x="285" y="120" font-family="Arial" font-size="14" fill="#2B6CB0" font-weight="bold">IDENTIFIED CVEs</text>
-        <text x="285" y="155" font-family="Arial" font-size="16" fill="#2D3748">{cves}</text>
-
-        <!-- IP Card -->
-        <rect x="530" y="90" width="240" height="100" fill="#EDF2F7" stroke="#4A5568" stroke-width="2" rx="8"/>
-        <text x="545" y="120" font-family="Arial" font-size="14" fill="#2D3748" font-weight="bold">LOCKED IPs</text>
-        <text x="545" y="155" font-family="Arial" font-size="16" fill="#2D3748">{ips}</text>
-
-        <!-- Mitigations Section -->
-        <rect x="30" y="210" width="740" height="160" fill="#FFFFFF" stroke="#CBD5E0" stroke-width="1.5" rx="8"/>
-        <text x="40" y="238" font-family="Arial" font-size="16" font-weight="bold" fill="#1A365D">RECOMMENDED MITIGATION STEPS</text>
-        {action_items_xml}
-    </svg>"""
-
-    svg_path = os.path.join(OUTPUT_DIR, "infographic_blueprint.svg")
-    with open(svg_path, "w", encoding="utf-8") as f:
-        f.write(svg_content)
-
-    return svg_path
+def _svg_clip(text: str, limit: int) -> str:
+    """Collapse whitespace and clip SVG label text with an explicit ellipsis."""
+    text = " ".join(str(text).split())
+    return text if len(text) <= limit else text[: limit - 1].rstrip(" ,;:-") + "…"
 
 
 def generate_infographic_svg(canonical_facts: Dict[str, Any]) -> str:
-    """Render a responsive, content-aware SVG infographic and return its path."""
-    design = infer_design(canonical_facts)
+    """Render a responsive SVG infographic strictly derived from the supplied facts."""
+    facts = canonical_facts or {}
+    design = infer_design(facts)
     c = design["palette"]
-    title = escape(str(canonical_facts.get("title") or "Situation Brief"))
-    severity = escape(str(canonical_facts.get("severity") or "UNRATED"))
-    summary_lines = wrap(str(canonical_facts.get("summary") or "Key facts and recommended response"), 100) or [""]
-    cves = as_items(canonical_facts.get("cve_ids"))
-    ips = as_items(canonical_facts.get("locked_ips"))
-    systems = as_items(canonical_facts.get("affected_systems"))
-    actions = as_items(canonical_facts.get("recommended_actions")) or ["Review the source and confirm next steps."]
-    action_lines = [(str(action), wrap(str(action), 64) or [""]) for action in actions]
-    badges = [*(f"CVE {x}" for x in cves[:4]), *(f"IP {x}" for x in ips[:3])]
     layout = design["layout"]
-    summary_y = 242 if badges else 212
-    card_y = summary_y + 42 + 22 * len(summary_lines)
-    if layout == "timeline":
-        panel_height = max(180, 78 + len(actions) * 66)
-    elif layout == "process_flow":
-        panel_height = max(190, 72 + ((len(actions) + 2) // 3) * 112)
-    elif layout == "split_comparison":
-        panel_height = max(190, 125 + ((len(actions) + 1) // 2) * 38)
-    else:
-        panel_height = max(180, 65 + ((len(actions) + 1) // 2) * 44)
-    panel_y = card_y + 120
-    height = panel_y + panel_height + 34
+    title = escape(_fact_headline(facts))
+    cves = _fact_items(facts.get("cve_ids") or facts.get("cve_id"))
+    ips = _fact_items(facts.get("locked_ips"))
+    systems = _fact_items(facts.get("affected_systems") or facts.get("affected_products"))
+    actions = _fact_items(
+        facts.get("recommended_actions") or facts.get("recommendations") or facts.get("mitigation_steps") or facts.get("key_points")
+    )
+    severities = _fact_items(facts.get("severity") or facts.get("risk_level"))
+    severity = severities[0].upper() if severities else ""
+    severity_color = _SEVERITY_COLORS.get(severity, c["secondary"])
+    summary_text = " ".join(_fact_items(facts.get("summary")))
+    summary_lines = wrap(summary_text, 100) if summary_text else []
+    if len(summary_lines) > 6:
+        summary_lines = summary_lines[:5] + [_svg_clip(" ".join(summary_lines[5:]), 100)]
+
+    badge_html = ""
+    if severity:
+        badge_html = (
+            f'<rect x="800" y="36" width="155" height="39" rx="19" fill="{severity_color}"/>'
+            f'<text x="877" y="61" text-anchor="middle" fill="#fff" font-family="Arial" font-size="14" font-weight="700">{escape(_svg_clip(severity, 16))}</text>'
+        )
+
+    body = []
+    y = 178
+
+    # Identifier chips: one chip per CVE / IP actually present in the source facts.
+    badges = [*(f"CVE {value}" for value in cves[:4]), *(f"IP {value}" for value in ips[:3])]
+    if badges:
+        x = 40
+        for badge in badges:
+            label = escape(str(badge)[:34])
+            chip_width = min(230, max(110, len(label) * 8 + 32))
+            if x + chip_width > 965:
+                break
+            body.append(f'<rect x="{x}" y="{y}" width="{chip_width}" height="30" rx="15" fill="{c["surface"]}" stroke="{c["highlight"]}"/><text x="{x+14}" y="{y+20}" fill="{c["ink"]}" font-family="Arial" font-size="12">{label}</text>')
+            x += chip_width + 10
+        y += 46
+
+    # Brief: only the supplied summary, no filler copy.
+    if summary_lines:
+        body.append(f'<text x="40" y="{y+14}" fill="{c["muted"]}" font-family="Arial" font-size="13" font-weight="700">BRIEF</text>')
+        for index, line in enumerate(summary_lines):
+            body.append(f'<text x="40" y="{y+40+index*22}" fill="{c["ink"]}" font-family="Arial" font-size="15">{escape(line)}</text>')
+        y += 40 + 22 * len(summary_lines) + 14
+
+    # Key callouts: only fact categories that exist in the input are rendered.
+    callouts = []
+    if severity:
+        callouts.append(("SEVERITY RATING", severity, "alert", severity_color))
+    if systems:
+        callouts.append(("AFFECTED SYSTEMS", ", ".join(systems), "server", c["highlight"]))
+    if cves:
+        callouts.append(("IDENTIFIED CVEs", ", ".join(cves), "shield", c["accent"]))
+    if ips:
+        callouts.append(("TRACKED IPs", ", ".join(ips), "lock", c["secondary"]))
+    if callouts:
+        columns = min(3, len(callouts))
+        card_width = (920 - (columns - 1) * 14) // columns
+        wrap_chars = max(14, min(60, int((card_width - 48) / 7.3)))
+        for index, (label, value, icon_name, accent) in enumerate(callouts):
+            row, column = divmod(index, columns)
+            card_x, card_top = 40 + column * (card_width + 14), y + row * 114
+            body.append(f'<rect x="{card_x}" y="{card_top}" width="{card_width}" height="100" rx="14" fill="{c["surface"]}" stroke="{c["border"]}" stroke-width="1" filter="url(#shadow)"/><rect x="{card_x}" y="{card_top}" width="5" height="100" rx="2" fill="{accent}"/><rect x="{card_x+1}" y="{card_top+1}" width="{card_width-2}" height="98" rx="13" fill="url(#accentWash)" opacity=".45"/><text x="{card_x+24}" y="{card_top+26}" fill="{c["muted"]}" font-family="Arial" font-size="11" font-weight="700">{escape(label)}</text>')
+            body.append(svg_icon(icon_name, card_x + card_width - 40, card_top + 12, accent, 22))
+            value_lines = wrap(value, wrap_chars) or [value]
+            if len(value_lines) > 3:
+                value_lines = value_lines[:2] + [_svg_clip(" ".join(value_lines[2:]), wrap_chars)]
+            for line_index, line in enumerate(value_lines):
+                body.append(f'<text x="{card_x+24}" y="{card_top+52+line_index*17}" fill="{c["ink"]}" font-family="Arial" font-size="14">{escape(line)}</text>')
+        callout_rows = (len(callouts) + columns - 1) // columns
+        y += callout_rows * 114 - 14 + 18
+
+    # Signal profile: bar lengths are counts of the fact entries above, nothing more.
+    signals = [
+        ("CVEs", len(cves), c["accent"]),
+        ("IP indicators", len(ips), c["highlight"]),
+        ("Affected systems", len(systems), c["secondary"]),
+        ("Response steps", len(actions), c["success"]),
+    ]
+    signals = [entry for entry in signals if entry[1] > 0]
+    if signals:
+        max_count = max(entry[1] for entry in signals)
+        body.append(f'<text x="62" y="{y+24}" fill="{c["muted"]}" font-family="Arial" font-size="13" font-weight="700">SOURCE SIGNAL PROFILE</text>')
+        for index, (label, count, color) in enumerate(signals):
+            row_y = y + 44 + index * 38
+            bar_width = max(26, int(560 * count / max_count))
+            body.append(f'<text x="62" y="{row_y+9}" fill="{c["ink"]}" font-family="Arial" font-size="12">{escape(label)}</text>')
+            body.append(f'<rect x="250" y="{row_y}" width="560" height="10" rx="5" fill="{c["border"]}"/><rect x="250" y="{row_y}" width="{bar_width}" height="10" rx="5" fill="{color}"/><text x="{262+bar_width}" y="{row_y+9}" fill="{c["ink"]}" font-family="Arial" font-size="11" font-weight="700">{count}</text>')
+        y += 44 + len(signals) * 38 + 14
+
+    # Severity scale: only when the rating matches the fixed taxonomy.
+    if severity in _SEVERITY_COLORS:
+        ramp = [("LOW", "#34866D"), ("MEDIUM", "#D28A25"), ("HIGH", "#D14B3F"), ("CRITICAL", "#B42332")]
+        segment_width = 176
+        body.append(f'<text x="62" y="{y+26}" fill="{c["muted"]}" font-family="Arial" font-size="13" font-weight="700">SEVERITY LEVEL</text>')
+        for index, (level, color) in enumerate(ramp):
+            segment_x = 178 + index * segment_width
+            active = level == severity
+            body.append(f'<rect x="{segment_x+4}" y="{y+14}" width="{segment_width-8}" height="12" rx="6" fill="{color}" opacity="{1 if active else 0.25}"/>')
+            body.append(f'<text x="{segment_x+segment_width//2}" y="{y+46}" text-anchor="middle" fill="{c["ink"] if active else c["muted"]}" font-family="Arial" font-size="10" font-weight="{700 if active else 400}">{level}</text>')
+            if active:
+                body.append(f'<circle cx="{segment_x+segment_width//2}" cy="{y+8}" r="5" fill="{color}" stroke="{c["surface"]}" stroke-width="2"/>')
+        y += 60
+
+    # Response panel: rendered only when recommended actions exist.
+    if actions:
+        action_lines = [(str(action), wrap(str(action), 64) or [""]) for action in actions]
+        if layout == "timeline":
+            panel_height = max(180, 78 + len(actions) * 66)
+        elif layout == "process_flow":
+            panel_height = max(190, 72 + ((len(actions) + 2) // 3) * 112)
+        elif layout == "split_comparison":
+            panel_height = max(190, 125 + ((len(actions) + 1) // 2) * 38)
+        else:
+            panel_height = max(180, 65 + ((len(actions) + 1) // 2) * 44)
+        body.append(f'<rect x="40" y="{y}" width="920" height="{panel_height}" rx="16" fill="{c["surface"]}" stroke="{c["border"]}" stroke-width="1" filter="url(#shadow)"/><text x="86" y="{y+35}" fill="{c["primary"]}" font-family="Arial" font-size="17" font-weight="700">RECOMMENDED RESPONSE</text><rect x="62" y="{y+53}" width="876" height="2" fill="{c["border"]}"/><rect x="62" y="{y+53}" width="136" height="3" rx="2" fill="{c["accent"]}"/>')
+        body.append(svg_icon("check", 62, y+17, c["success"], 22))
+        if layout == "process_flow":
+            for index, (action_text, _) in enumerate(action_lines):
+                row, column = divmod(index, 3)
+                box_x, box_top = 62 + column * 290, y + 66 + row * 112
+                body.append(f'<rect x="{box_x}" y="{box_top}" width="260" height="88" rx="12" fill="{c["background"]}" stroke="{c["highlight"]}"/><circle cx="{box_x+25}" cy="{box_top+25}" r="15" fill="{c["primary"]}"/><text x="{box_x+25}" y="{box_top+30}" text-anchor="middle" fill="#fff" font-family="Arial" font-size="13">{index+1}</text>')
+                flow_lines = wrap(action_text, 34)
+                if len(flow_lines) > 3:
+                    flow_lines = flow_lines[:2] + [_svg_clip(" ".join(flow_lines[2:]), 34)]
+                for line_index, line in enumerate(flow_lines):
+                    body.append(f'<text x="{box_x+50}" y="{box_top+29+line_index*17}" fill="{c["ink"]}" font-family="Arial" font-size="12">{escape(line)}</text>')
+        elif layout == "timeline":
+            body.append(f'<path d="M84 {y+73}v{max(40, len(actions)*66)}" stroke="{c["highlight"]}" stroke-width="4"/>')
+            for index, (_, lines) in enumerate(action_lines):
+                line_y = y + 78 + index * 66
+                body.append(f'<circle cx="84" cy="{line_y-5}" r="10" fill="{c["accent"]}"/><text x="112" y="{line_y}" fill="{c["ink"]}" font-family="Arial" font-size="13">{index+1:02d}  {escape(_svg_clip(" ".join(lines), 105))}</text>')
+        elif layout == "split_comparison":
+            split = max(1, (len(actions) + 1) // 2)
+            for column, heading, items in ((0, "ASSESSMENT", action_lines[:split]), (1, "RESPONSE", action_lines[split:] or action_lines[:1])):
+                box_x = 62 + column * 440
+                body.append(f'<rect x="{box_x}" y="{y+65}" width="418" height="{panel_height-82}" rx="12" fill="{c["background"]}"/><text x="{box_x+18}" y="{y+92}" fill="{c["secondary"]}" font-family="Arial" font-size="12" font-weight="700">{heading}</text>')
+                for index, (_, lines) in enumerate(items):
+                    body.append(f'<text x="{box_x+20}" y="{y+122+index*35}" fill="{c["ink"]}" font-family="Arial" font-size="12">• {escape(_svg_clip(" ".join(lines), 60))}</text>')
+        else:
+            columns = 2 if len(actions) > 2 else 1
+            box_width = (876 - (columns - 1) * 14) // columns
+            row_limit = max(40, int((box_width - 40) / 6.2))
+            for index, (_, lines) in enumerate(action_lines):
+                row, column = divmod(index, columns)
+                box_x, box_top = 62 + column * (box_width + 14), y + 64 + row * 44
+                body.append(f'<rect x="{box_x}" y="{box_top}" width="{box_width}" height="34" rx="9" fill="{c["background"]}"/><circle cx="{box_x+17}" cy="{box_top+17}" r="6" fill="{c["accent"]}"/><text x="{box_x+32}" y="{box_top+22}" fill="{c["ink"]}" font-family="Arial" font-size="12">{escape(_svg_clip(" ".join(lines), row_limit))}</text>')
+        y += panel_height + 16
+
+    height = max(y + 18, 260)
     parts = [f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 {height}" width="100%" role="img" aria-label="{title}">
 <defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="{c['primary']}" flood-opacity=".14"/></filter><linearGradient id="banner"><stop stop-color="{c['primary']}"/><stop offset="1" stop-color="{c['secondary']}"/></linearGradient><linearGradient id="accentWash" x2="1" y2="1"><stop stop-color="{c['accent']}" stop-opacity=".18"/><stop offset="1" stop-color="{c['highlight']}" stop-opacity=".04"/></linearGradient></defs><style>text{{font-family:'Segoe UI',Inter,Arial,sans-serif;line-height:1.45}}</style>
 <rect width="100%" height="100%" rx="22" fill="{c['background']}"/><rect width="1000" height="158" rx="22" fill="url(#banner)"/><path d="M0 138 Q500 176 1000 132 V158 Q1000 176 980 176 H20 Q0 176 0 158Z" fill="{c['accent']}"/>
 {svg_icon(design['icon'], 40, 35, '#FFFFFF', 32)}<text x="88" y="58" fill="#fff" font-family="Arial" font-size="13" font-weight="700" letter-spacing="2">{escape(design['topic'].upper())} / {layout.replace('_',' ').upper()}</text>
-<text x="40" y="108" fill="#fff" font-family="Arial" font-size="{max(16,min(32,int(920/max(1,len(title)*.56))))}" font-weight="700">{title[:100]}</text><rect x="800" y="36" width="155" height="39" rx="19" fill="{design['severity_color']}"/><text x="877" y="61" text-anchor="middle" fill="#fff" font-family="Arial" font-size="14" font-weight="700">{severity}</text>''']
-    x = 40
-    for badge in badges:
-        label = escape(str(badge)[:34]); chip_width = min(230, max(110, len(label) * 8 + 32))
-        if x + chip_width > 965: break
-        parts.append(f'<rect x="{x}" y="178" width="{chip_width}" height="30" rx="15" fill="{c["surface"]}" stroke="{c["highlight"]}"/><text x="{x+14}" y="198" fill="{c["ink"]}" font-family="Arial" font-size="12">{label}</text>')
-        x += chip_width + 10
-    parts.append(f'<text x="40" y="{summary_y}" fill="{c["muted"]}" font-family="Arial" font-size="13" font-weight="700">BRIEF</text>')
-    for i, line in enumerate(summary_lines):
-        parts.append(f'<text x="40" y="{summary_y+25+i*22}" fill="{c["ink"]}" font-family="Arial" font-size="15">{escape(line)}</text>')
-    values = [("SEVERITY", severity), ("AFFECTED SYSTEMS", ", ".join(map(str, systems)) or "See source details"), ("INDICATORS", ", ".join(map(str, cves+ips)) or "None listed")]
-    for i, (label, value) in enumerate(values):
-        x = 40 + i*312
-        parts.append(f'<rect x="{x}" y="{card_y}" width="296" height="100" rx="14" fill="{c["surface"]}" stroke="{c["border"]}" stroke-width="1" filter="url(#shadow)"/><rect x="{x}" y="{card_y}" width="5" height="100" rx="2" fill="{design["severity_color"] if i == 0 else c["highlight"]}"/><rect x="{x+1}" y="{card_y+1}" width="294" height="98" rx="13" fill="url(#accentWash)" opacity=".45"/><text x="{x+24}" y="{card_y+26}" fill="{c["muted"]}" font-family="Arial" font-size="11" font-weight="700">{label}</text>')
-        icon_name = "alert" if i == 0 else "server" if i == 1 else "lock"
-        parts.append(svg_icon(icon_name, x+256, card_y+12, design["severity_color"] if i == 0 else c["highlight"], 22))
-        for j, line in enumerate(wrap(str(value), 34)[:3]):
-            parts.append(f'<text x="{x+24}" y="{card_y+52+j*17}" fill="{c["ink"]}" font-family="Arial" font-size="14">{escape(line)}</text>')
-    parts.append(f'<rect x="40" y="{panel_y}" width="920" height="{panel_height}" rx="16" fill="{c["surface"]}" stroke="{c["border"]}" stroke-width="1" filter="url(#shadow)"/><text x="86" y="{panel_y+35}" fill="{c["primary"]}" font-family="Arial" font-size="17" font-weight="700">RECOMMENDED RESPONSE</text><rect x="62" y="{panel_y+53}" width="876" height="2" fill="{c["border"]}"/><rect x="62" y="{panel_y+53}" width="136" height="3" rx="2" fill="{c["accent"]}"/>')
-    parts.append(svg_icon("check", 62, panel_y+17, c["success"], 22))
-    if layout == "process_flow":
-        for i, (_, lines) in enumerate(action_lines):
-            row, col = divmod(i, 3); x, y = 62+col*290, panel_y+66+row*112
-            parts.append(f'<rect x="{x}" y="{y}" width="260" height="88" rx="12" fill="{c["background"]}" stroke="{c["highlight"]}"/><circle cx="{x+25}" cy="{y+25}" r="15" fill="{c["primary"]}"/><text x="{x+25}" y="{y+30}" text-anchor="middle" fill="#fff" font-family="Arial" font-size="13">{i+1}</text>')
-            for j, line in enumerate(lines[:3]): parts.append(f'<text x="{x+50}" y="{y+29+j*17}" fill="{c["ink"]}" font-family="Arial" font-size="12">{escape(line)}</text>')
-    elif layout == "timeline":
-        parts.append(f'<path d="M84 {panel_y+73}v{max(40,len(actions)*66)}" stroke="{c["highlight"]}" stroke-width="4"/>')
-        for i, (_, lines) in enumerate(action_lines):
-            y=panel_y+78+i*66; parts.append(f'<circle cx="84" cy="{y-5}" r="10" fill="{c["accent"]}"/><text x="112" y="{y}" fill="{c["ink"]}" font-family="Arial" font-size="13">{i+1:02d}  {escape(" ".join(lines)[:105])}</text>')
-    elif layout == "split_comparison":
-        split=max(1,(len(actions)+1)//2)
-        for col, heading, items in ((0,"ASSESSMENT",action_lines[:split]),(1,"RESPONSE",action_lines[split:] or action_lines[:1])):
-            x=62+col*440; parts.append(f'<rect x="{x}" y="{panel_y+65}" width="418" height="{panel_height-82}" rx="12" fill="{c["background"]}"/><text x="{x+18}" y="{panel_y+92}" fill="{c["secondary"]}" font-family="Arial" font-size="12" font-weight="700">{heading}</text>')
-            for i, (_, lines) in enumerate(items): parts.append(f'<text x="{x+20}" y="{panel_y+122+i*35}" fill="{c["ink"]}" font-family="Arial" font-size="12">• {escape(" ".join(lines)[:72])}</text>')
-    else:
-        cols=2 if len(actions)>2 else 1; box_width=(876-(cols-1)*14)//cols
-        for i, (_, lines) in enumerate(action_lines):
-            row,col=divmod(i,cols); x,y=62+col*(box_width+14),panel_y+64+row*44
-            parts.append(f'<rect x="{x}" y="{y}" width="{box_width}" height="34" rx="9" fill="{c["background"]}"/><circle cx="{x+17}" cy="{y+17}" r="6" fill="{c["accent"]}"/><text x="{x+32}" y="{y+22}" fill="{c["ink"]}" font-family="Arial" font-size="12">{escape(" ".join(lines)[:100])}</text>')
+<text x="40" y="108" fill="#fff" font-family="Arial" font-size="{max(16,min(32,int(920/max(1,len(title)*.56))))}" font-weight="700">{title}</text>{badge_html}''']
+    parts.extend(body)
     parts.append('</svg>')
     svg_path = os.path.join(OUTPUT_DIR, "infographic_blueprint.svg")
     with open(svg_path, "w", encoding="utf-8") as f:

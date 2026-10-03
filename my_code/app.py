@@ -2,6 +2,11 @@ import os
 import json
 import streamlit as st
 import streamlit.components.v1 as components
+import sys
+from pathlib import Path
+
+# Fix Python path so module imports resolution work automatically
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 # Import core pipeline modules
 from modules.extractor import extract_raw_text, lock_deterministic_parameters
@@ -19,7 +24,7 @@ from modules.generators import (
     generate_summary,
 )
 from modules.social_engine import process_social_transformation
-from modules.video_engine import generate_video_blueprint, create_video
+from modules.video_engine import generate_video_blueprint
 from modules.presentation_engine import generate_dynamic_presentation
 from modules.threat_intel_engine import retrieve_threat_intel, validate_advisory_against_evidence
 

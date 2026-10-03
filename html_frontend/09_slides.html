@@ -8,60 +8,146 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
-  <header class="border-b-2 border-slate-900 bg-white">
-    <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between">
-        <a href="/" class="text-2xl font-extrabold tracking-tight" style="font-family:'Plus Jakarta Sans','Inter',system-ui,sans-serif">UnifiOps</a>
-        <span class="text-xs font-medium uppercase tracking-wider text-slate-500">Slide deck preview</span>
+  <header class="sticky top-0 left-0 right-0 z-50 bg-white border-b-[1.5px] border-slate-900">
+  <div class="h-16 max-w-[1280px] mx-auto px-6 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <span class="justify-self-start font-extrabold tracking-tight text-slate-950 shrink-0" style="font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em;">UnifiOps</span>
+    <div class="hidden sm:flex items-center justify-center gap-2 min-w-0">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-[1.5px] border-slate-900 bg-white font-bold uppercase text-[10px] tracking-wide text-slate-800">
+        <span class="material-symbols-outlined text-[15px] leading-none shrink-0">description</span>
+        <span id="sourceDocumentBadge" class="truncate max-w-[200px] leading-none">Uploaded Document</span>
       </div>
-      <nav class="flex w-full flex-row flex-wrap items-center justify-center gap-2.5" aria-label="Deliverable navigation">
-        <a href="/social" class="rounded-full border-2 border-slate-900 bg-white px-5 py-1.5 text-center text-xs font-bold text-slate-800 hover:bg-slate-100">LinkedIn &amp; X</a>
-        <a href="/video" class="rounded-full border-2 border-slate-900 bg-white px-5 py-1.5 text-center text-xs font-bold text-slate-800 hover:bg-slate-100">Video Script &amp; Preview</a>
-        <a href="/advisory" class="rounded-full border-2 border-slate-900 bg-white px-5 py-1.5 text-center text-xs font-bold text-slate-800 hover:bg-slate-100">Official Advisory</a>
-        <a href="/summary" class="rounded-full border-2 border-slate-900 bg-white px-5 py-1.5 text-center text-xs font-bold text-slate-800 hover:bg-slate-100">Executive Summary</a>
-        <a href="/slides" aria-current="page" class="rounded-full border-2 border-slate-950 bg-[#F0E6FF] px-5 py-1.5 text-center text-xs font-bold text-[#3B1262] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">Slide Deck</a>
-        <a href="/infographics" class="rounded-full border-2 border-slate-900 bg-white px-5 py-1.5 text-center text-xs font-bold text-slate-800 hover:bg-slate-100">Infographics</a>
-      </nav>
+      <span id="audienceBadge" class="inline-flex items-center justify-center px-3 py-1 rounded-full border-[1.5px] border-slate-900 bg-[#C8F250] text-slate-900 font-bold uppercase text-[10px] tracking-wide leading-none shrink-0">General</span>
+      <span id="toneBadge" class="inline-flex items-center justify-center px-3 py-1 rounded-full border-[1.5px] border-slate-900 bg-[#E1E0FF] text-slate-800 font-bold uppercase text-[10px] tracking-wide leading-none shrink-0">Professional</span>
     </div>
-  </header>
+    <div class="justify-self-end flex items-center gap-3 shrink-0">
+      <a class="inline-flex items-center px-4 py-1.5 bg-white text-slate-900 border-[1.5px] border-slate-900 rounded-full text-xs font-bold shadow-[3px_3px_0px_#1c1b20] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0px_#1c1b20] transition-all" data-path="deliverables-list" href="/processing">← Back to All Deliverables</a>
+      <div class="w-8 h-8 rounded-full bg-slate-950 flex items-center justify-center border-[1.5px] border-slate-900 shadow-[2px_2px_0px_#1c1b20]"><span class="material-symbols-outlined text-white text-[18px]">person</span></div>
+    </div>
+  </div>
+  <div class="h-14 border-t-[1.5px] border-slate-900 bg-white flex items-center">
+    <nav class="max-w-[1280px] mx-auto px-6 w-full flex flex-row flex-nowrap items-center justify-center gap-2.5 overflow-x-auto no-scrollbar py-1" role="navigation" aria-label="Deliverable navigation"><a href="/social" class="rounded-full px-5 py-1.5 text-xs font-bold border-[1.5px] border-slate-900 bg-white text-slate-800 hover:bg-slate-100 transition inline-flex items-center justify-center shrink-0">LinkedIn &amp; X</a><a href="/video" class="rounded-full px-5 py-1.5 text-xs font-bold border-[1.5px] border-slate-900 bg-white text-slate-800 hover:bg-slate-100 transition inline-flex items-center justify-center shrink-0">Video Script &amp; Preview</a><a href="/advisory" class="rounded-full px-5 py-1.5 text-xs font-bold border-[1.5px] border-slate-900 bg-white text-slate-800 hover:bg-slate-100 transition inline-flex items-center justify-center shrink-0">Official Advisory</a><a href="/summary" class="rounded-full px-5 py-1.5 text-xs font-bold border-[1.5px] border-slate-900 bg-white text-slate-800 hover:bg-slate-100 transition inline-flex items-center justify-center shrink-0">Executive Summary</a><a href="/slides" class="rounded-full px-5 py-1.5 text-xs font-bold border-2 border-slate-950 bg-[#F0E6FF] text-[#3B1262] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] inline-flex items-center justify-center shrink-0" aria-current="page">Slide Deck</a><a href="/infographics" class="rounded-full px-5 py-1.5 text-xs font-bold border-[1.5px] border-slate-900 bg-white text-slate-800 hover:bg-slate-100 transition inline-flex items-center justify-center shrink-0">Infographics</a></nav>
+  </div>
+</header>
   <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
     <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
         <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Presentation preview</p>
-        <h1 id="deckTitle" class="mt-2 text-2xl font-extrabold tracking-tight">Executive Security Briefing</h1>
+        <h1 id="deckTitle" class="mt-2 text-2xl font-extrabold tracking-tight">Uploaded Document</h1>
       </div>
       <a id="downloadPresentation" href="#" class="inline-flex items-center justify-center rounded-full border-2 border-slate-900 bg-[#F0E6FF] px-5 py-3 text-sm font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">Download Presentation .PPTX</a>
     </div>
     <p id="slidesNotice" class="mb-5 text-sm text-slate-600" role="status">Slide previews are generated from the transformed document.</p>
-    <section id="slidePreviewGrid" class="grid gap-5 md:grid-cols-2" aria-live="polite">
-      <article class="rounded-2xl border-2 border-slate-900 bg-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Slide 1</p><h2 class="mt-2 text-lg font-extrabold">Executive Title &amp; Advisory Reference</h2><p data-slide="1" class="mt-3 text-sm leading-6 text-slate-700">Upload a document via Chat to preview generated slides.</p></article>
-      <article class="rounded-2xl border-2 border-slate-900 bg-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Slide 2</p><h2 class="mt-2 text-lg font-extrabold">Vulnerability Details &amp; Threat Context</h2><p data-slide="2" class="mt-3 text-sm leading-6 text-slate-700">CVE identifiers and source-grounded threat context appear here.</p></article>
-      <article class="rounded-2xl border-2 border-slate-900 bg-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Slide 3</p><h2 class="mt-2 text-lg font-extrabold">Affected Products &amp; Enterprise Risk</h2><p data-slide="3" class="mt-3 text-sm leading-6 text-slate-700">Affected products and severity appear here.</p></article>
-      <article class="rounded-2xl border-2 border-slate-900 bg-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Slide 4</p><h2 class="mt-2 text-lg font-extrabold">Required Action &amp; Patch Guidelines</h2><p data-slide="4" class="mt-3 text-sm leading-6 text-slate-700">Recommended mitigations appear here.</p></article>
-    </section>
+    <section id="slidePreviewGrid" class="grid gap-5 md:grid-cols-2" aria-live="polite"></section>
   </main>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const list = value => Array.isArray(value) ? value.filter(Boolean).map(String) : value ? [String(value)] : [];
       try {
         const data = JSON.parse(sessionStorage.getItem('transformResult') || 'null');
+        const documentBadge = document.getElementById('sourceDocumentBadge');
+        if (documentBadge) documentBadge.textContent = data?.filename || data?.canonical_facts?.title || 'Uploaded Document';
+        const audienceBadge = document.getElementById('audienceBadge');
+        if (audienceBadge) audienceBadge.textContent = data?.operator_config?.target_audience || data?.target_audience || 'General';
+        const toneBadge = document.getElementById('toneBadge');
+        if (toneBadge) toneBadge.textContent = data?.operator_config?.tone || data?.tone || 'Professional';
+        const grid = document.getElementById('slidePreviewGrid');
+        const notice = document.getElementById('slidesNotice');
+        const buildEmptyCard = (heading, copy) => {
+          const card = document.createElement('article');
+          card.className = 'rounded-2xl border-2 border-slate-900 bg-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:col-span-2';
+          const cardTitle = document.createElement('h2');
+          cardTitle.className = 'text-lg font-extrabold';
+          cardTitle.textContent = heading;
+          const body = document.createElement('p');
+          body.className = 'mt-3 text-sm leading-6 text-slate-700';
+          body.textContent = copy;
+          card.append(cardTitle, body);
+          return card;
+        };
         if (!data) {
-          document.getElementById('slidesNotice').textContent = 'No transformation found. Upload a document via Chat to generate slide previews.';
+          grid.replaceChildren(buildEmptyCard('No slide previews available', 'Upload a document via Chat to generate slide preview cards.'));
+          document.getElementById('downloadPresentation').hidden = true;
+          notice.textContent = 'No transformation found. Upload a document via Chat to generate slide previews.';
           return;
         }
         const facts = data.canonical_facts || {};
-        const title = facts.title || data.title || 'Executive Security Briefing';
-        const summary = facts.summary || data.summary || 'No summary was returned.';
+        const title = facts.title || data.title || data.filename || 'Uploaded Document';
+        const summary = facts.summary || data.summary || '';
         const cves = list(facts.cve_ids || facts.cve_id);
         const systems = list(facts.affected_systems || facts.affected_products);
         const actions = list(facts.recommended_actions || facts.recommendations);
+        const severity = facts.severity || facts.risk_level || '';
         document.getElementById('deckTitle').textContent = title;
-        document.querySelector('[data-slide="1"]').textContent = `${title}${cves.length ? ` — ${cves.join(', ')}` : ''}`;
-        document.querySelector('[data-slide="2"]').textContent = [summary, cves.length ? `CVE: ${cves.join(', ')}` : 'No CVE identifier was extracted.'].join('\n\n');
-        document.querySelector('[data-slide="3"]').textContent = `Severity: ${facts.severity || facts.risk_level || 'Not identified'}\nAffected: ${systems.join(', ') || 'Not identified in source'}`;
-        document.querySelector('[data-slide="4"]').textContent = actions.length ? actions.map((action, index) => `${index + 1}. ${action}`).join('\n') : 'No remediation action was extracted from the source.';
+        const structure = data.presentation_structure || {};
+        const sourceSlides = Array.isArray(structure.slides) ? structure.slides : [];
+        let usedDerived = false;
+        let cards;
+        if (sourceSlides.length) {
+          cards = sourceSlides.map((slide, index) => ({
+            number: slide.slide_number || index + 1,
+            layout: String(slide.layout || 'standard').replace(/_/g, ' '),
+            title: slide.title || `Slide ${index + 1}`,
+            key_points: list(slide.key_points),
+            notes: typeof slide.speaker_notes === 'string' ? slide.speaker_notes : ''
+          }));
+        } else {
+          usedDerived = true;
+          const derived = [
+            { layout: 'derived', title: 'Executive Title & Advisory Reference', key_points: [`Document: ${title}`, ...(cves.length ? [`CVE identifiers: ${cves.join(', ')}`] : [])] },
+            { layout: 'derived', title: 'Vulnerability Details & Threat Context', key_points: summary ? [summary] : [] },
+            { layout: 'derived', title: 'Affected Products & Enterprise Risk', key_points: [...(severity ? [`Severity: ${severity}`] : []), ...(systems.length ? [`Affected: ${systems.join(', ')}`] : [])] },
+            { layout: 'derived', title: 'Required Action & Patch Guidelines', key_points: [...actions] }
+          ];
+          cards = derived.filter(slide => slide.key_points.length).map((slide, index) => ({ ...slide, number: index + 1, notes: '' }));
+        }
+        const renderCard = (slide) => {
+          const card = document.createElement('article');
+          card.className = 'rounded-2xl border-2 border-slate-900 bg-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]';
+          const eyebrow = document.createElement('p');
+          eyebrow.className = 'text-xs font-bold uppercase tracking-wider text-slate-500';
+          eyebrow.textContent = `Slide ${slide.number} • ${slide.layout}`;
+          const heading = document.createElement('h2');
+          heading.className = 'mt-2 text-lg font-extrabold';
+          heading.textContent = slide.title;
+          card.append(eyebrow, heading);
+          if (slide.key_points.length) {
+            const points = document.createElement('ul');
+            points.className = 'mt-3 list-disc space-y-1 pl-5 text-sm leading-6 text-slate-700';
+            slide.key_points.forEach(point => {
+              const item = document.createElement('li');
+              item.textContent = String(point);
+              points.appendChild(item);
+            });
+            card.appendChild(points);
+          } else {
+            const placeholder = document.createElement('p');
+            placeholder.className = 'mt-3 text-sm leading-6 text-slate-500';
+            placeholder.textContent = 'No key points were generated for this slide.';
+            card.appendChild(placeholder);
+          }
+          if (slide.notes) {
+            const notes = document.createElement('p');
+            notes.className = 'mt-3 text-xs leading-5 text-slate-500';
+            notes.textContent = `Speaker notes: ${slide.notes}`;
+            card.appendChild(notes);
+          }
+          return card;
+        };
+        grid.replaceChildren();
+        if (cards.length) {
+          const fragment = document.createDocumentFragment();
+          cards.forEach(slide => fragment.appendChild(renderCard(slide)));
+          grid.appendChild(fragment);
+          notice.textContent = usedDerived
+            ? `No presentation structure was returned; showing ${cards.length} preview card(s) derived from the canonical facts.`
+            : `Showing ${cards.length} generated slide(s) from the transformed document.`;
+        } else {
+          grid.appendChild(buildEmptyCard('No slide previews available', 'The transformation did not return slide content to preview.'));
+          notice.textContent = 'No slide content was returned for this document.';
+        }
         const pptxUrl = data.download_urls?.presentation_pptx;
         const download = document.getElementById('downloadPresentation');
         if (pptxUrl) {
@@ -69,7 +155,7 @@
           download.setAttribute('download', 'presentation.pptx');
         } else {
           download.hidden = true;
-          document.getElementById('slidesNotice').textContent = 'Slide previews are ready, but no PowerPoint download URL was returned.';
+          notice.textContent = 'Slide previews are ready, but no PowerPoint download URL was returned.';
         }
       } catch (error) {
         console.error('Could not load slide preview data:', error);
