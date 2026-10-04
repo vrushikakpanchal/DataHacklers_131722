@@ -37,7 +37,7 @@ def build_canonical_facts(
     Integrates locked deterministic parameters (CVEs, IPs, Severities) if provided.
     """
     prompt = f"""
-    Analyze the following technical advisory text and extract structured facts.
+    Analyze the following advisory text and extract structured facts.
     Write human-readable values in {language}, at a {detail_level} level, using a {content_style} style for the objective: {objective}.
     Preserve all source facts and do not translate or alter technical identifiers.
     
@@ -50,10 +50,13 @@ def build_canonical_facts(
         "severity": "CRITICAL / HIGH / MEDIUM / LOW",
         "summary": "2-3 sentence executive summary",
         "cve_ids": ["CVE-YYYY-XXXX"],
-        "affected_systems": ["System or software names"],
+        "affected_systems": ["Every platform, product, service, website, app, software, hardware model, or named entity that is explicitly mentioned in the source as affected, targeted, misused, or involved — e.g. Shaadi.com, Tinder, WhatsApp, UPI, Apache HTTP Server. Include ALL such names found in the text. Leave empty ONLY if no such names appear."],
         "locked_ips": ["IP addresses mentioned"],
         "recommended_actions": ["Specific actionable mitigation step 1", "Step 2"]
     }}
+    
+    IMPORTANT for affected_systems: scan the entire source text for any named platforms, apps, websites, services, software products, hardware models, or organizations described as affected or involved. Do not restrict to technical software — include consumer apps, social networks, payment services, websites, and any explicitly named entity.
+    
     Do NOT include markdown wrapping or extra text outside JSON.
     """
     
@@ -83,6 +86,11 @@ def build_canonical_facts(
             facts["locked_ips"] = list(set(facts.get("locked_ips", []) + locked_params["locked_ips"]))
         if locked_params.get("locked_severities") and not facts.get("severity"):
             facts["severity"] = locked_params["locked_severities"][0]
+        # If the LLM returned no affected systems, fall back to deterministically
+        # extracted entity names from the source text so the list is never empty
+        # when named platforms/products are present.
+        if not facts.get("affected_systems") and locked_params.get("locked_entities"):
+            facts["affected_systems"] = list(locked_params["locked_entities"])
 
     return facts
 

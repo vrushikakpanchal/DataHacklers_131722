@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>AI Video Blueprint Generator</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        select,
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #222;
+            color: white;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .scene {
+            background: #ffffff;
+            padding: 20px;
+            margin: 18px 0;
+            border-radius: 10px;
+            border-left: 5px solid #333;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .metadata {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* Generated video */
+
+        .video-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .video-card video {
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 10px;
+            background: #000;
+            margin-top: 15px;
+        }
+
+        .download-button {
+            display: inline-block;
+            background: #222;
+            color: white;
+            text-decoration: none;
+            padding: 13px 25px;
+            border-radius: 7px;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .download-button:hover {
+            opacity: 0.85;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>AI Video Blueprint Generator</h1>
+
+
+    <div class="card">
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <h2>1. Source Document</h2>
+
+            <input
+                type="file"
+                name="document"
+                accept=".pdf,.docx,.txt"
+                required
+            >
+
+
+            <h2>2. Video Configuration</h2>
+
+            <div class="form-grid">
+
+                <div>
+
+                    <label>Target Audience</label>
+
+                    <select name="target_audience">
+
+                        <option>General Audience</option>
+                        <option>Students</option>
+                        <option>Technical Professionals</option>
+                        <option>Government Officials</option>
+                        <option>Cybersecurity Professionals</option>
+                        <option>Business Leaders</option>
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label>Tone</label>
+
+                    <select name="tone">
+
+                        <option>Professional</option>
+                        <option>Educational</option>
+                        <option>Conversational</option>
+                        <option>Formal</option>
+                        <option>Engaging</option>
+                        <option>Urgent</option>
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label>Language</label>
+
+                    <select name="language">
+
+                        <option>English</option>
+                        <option>Hindi</option>
+                        <option>Marathi</option>
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label>Duration</label>
+
+                    <select name="duration">
+
+                        <option value="30">30 seconds</option>
+                        <option value="60" selected>60 seconds</option>
+                        <option value="90">90 seconds</option>
+                        <option value="120">2 minutes</option>
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label>Objective</label>
+
+                    <select name="objective">
+
+                        <option>Inform</option>
+                        <option>Educate</option>
+                        <option>Raise Awareness</option>
+                        <option>Promote</option>
+                        <option>Explain</option>
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label>Video Style</label>
+
+                    <select name="style">
+
+                        <option>Educational</option>
+                        <option>News Report</option>
+                        <option>Explainer</option>
+                        <option>Corporate</option>
+                        <option>Social Media</option>
+                        <option>Cinematic</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <button type="submit">
+                Generate Video Blueprint
+            </button>
+
+        </form>
+
+
+        {% if error %}
+
+            <p class="error">{{ error }}</p>
+
+        {% endif %}
+
+    </div>
+
+
+    {% if result %}
+
+
+        <div class="card">
+
+            <h2>{{ result.title }}</h2>
+
+            <div class="metadata">
+
+                <p>
+                    <span class="label">Audience:</span>
+                    {{ result.target_audience }}
+                </p>
+
+                <p>
+                    <span class="label">Tone:</span>
+                    {{ result.tone }}
+                </p>
+
+                <p>
+                    <span class="label">Language:</span>
+                    {{ result.language }}
+                </p>
+
+                <p>
+                    <span class="label">Duration:</span>
+                    {{ result.duration_seconds }} seconds
+                </p>
+
+                <p>
+                    <span class="label">Objective:</span>
+                    {{ result.objective }}
+                </p>
+
+                <p>
+                    <span class="label">Style:</span>
+                    {{ result.style }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <h2>Scene-by-Scene Storyboard</h2>
+
+
+        {% for scene in result.scenes %}
+
+            <div class="scene">
+
+                <h3>
+                    Scene {{ scene.scene_number }}
+                </h3>
+
+                <p>
+                    <span class="label">Duration:</span>
+                    {{ scene.duration_seconds }} seconds
+                </p>
+
+                <p>
+                    <span class="label">
+                        Visual Description:
+                    </span>
+                    <br>
+                    {{ scene.visual_description }}
+                </p>
+
+                <p>
+                    <span class="label">
+                        On-Screen Text:
+                    </span>
+                    <br>
+                    {{ scene.on_screen_text }}
+                </p>
+
+                <p>
+                    <span class="label">
+                        Narration:
+                    </span>
+                    <br>
+                    {{ scene.narration }}
+                </p>
+
+                <p>
+                    <span class="label">
+                        Audio Cue:
+                    </span>
+                    <br>
+                    {{ scene.audio_cue }}
+                </p>
+
+                <p>
+                    <span class="label">
+                        Visual Recommendation:
+                    </span>
+                    <br>
+                    {{ scene.visual_recommendation }}
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+
+        <div class="card">
+
+            <h2>Full Narration</h2>
+
+            <p>
+                {{ result.full_narration }}
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Subtitle Structure</h2>
+
+            {% for subtitle in result.subtitles %}
+
+                <p>
+
+                    <strong>
+                        Scene {{ subtitle.scene_number }}:
+                    </strong>
+
+                    {{ subtitle.text }}
+
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- GENERATED VIDEO -->
+
+        {% if video_path %}
+
+            <div class="video-card">
+
+                <h2>Generated Video</h2>
+
+                <p>
+                    Your AI-generated video has been created successfully.
+                </p>
+
+                <video controls>
+
+                    <source
+                        src="{{ url_for('video', filename=video_path) }}"
+                        type="video/mp4"
+                    >
+
+                    Your browser does not support the video element.
+
+                </video>
+
+
+                <br>
+
+
+                <a
+                    class="download-button"
+                    href="{{ url_for('video', filename=video_path) }}"
+                    download
+                >
+                    Download Video
+                </a>
+
+            </div>
+
+        {% endif %}
+
+
+    {% endif %}
+
+</div>
+
+</body>
+
+</html>

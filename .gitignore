@@ -1,66 +1,101 @@
-# Python environments and caches
-/venv/
-/.venv/
-**/venv/
-**/.venv/
+# ==============================================================================
+# Git Ignore Rules for SIH PS 26154 Content Transformation Engine
+# ==============================================================================
+
+# Python Bytecode & Compilation Caches
 __pycache__/
-**/__pycache__/
 *.py[cod]
 *$py.class
+*.so
+.Python
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing & Type-Checking Caches
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .coverage
 htmlcov/
 
-# Local secrets and editor / OS files
+# Local Environment Secrets & Configuration
 .env
 .env.*
+.env.local
 !.env.example
+.streamlit/secrets.toml
+
+# IDE & Operating System Files
 .DS_Store
 Thumbs.db
+desktop.ini
 .idea/
 .vscode/
+*.swp
+*.swo
+*~
+.aider*
 
-# Uploaded files are temporary runtime data; keep directory structure
+# Runtime Generated Media & Artifacts (Keep folders via .gitkeep)
+*.mp4
+*.wav
+*.mp3
+*.log
+*.onnx
+output/_test_*
+
+# Local neural animation weights (keep folder structure)
+/my_code/models/**
+!/my_code/models/**/.gitkeep
+/models/**
+!/models/**/.gitkeep
+
+# Runtime Output & Upload Directories (Preserve directory structure)
 /temp_uploads/*
 !/temp_uploads/.gitkeep
+/output/*
+!/output/.gitkeep
+/video_scenes/*
+!/video_scenes/.gitkeep
+/data/outputs/*
+!/data/outputs/.gitkeep
+
+# Submodule runtime outputs & temporary folders
 /my_code/temp_uploads/*
 !/my_code/temp_uploads/.gitkeep
-
-# Generated output artifacts; retain directory placeholders
-/data/outputs/**
-!/data/outputs/.gitkeep
-/output/**
-!/output/.gitkeep
-/video_scenes/**
-!/video_scenes/.gitkeep
-/my_code/data/outputs/**
-!/my_code/data/outputs/.gitkeep
-/my_code/output/**
+/my_code/output/*
 !/my_code/output/.gitkeep
+/my_code/data/outputs/*
+!/my_code/data/outputs/.gitkeep
 
-# Standalone team prototypes not needed in core backend
-/tanvi_code/
-/sanika_code/
-
-# Active module dependencies required by adapters
+# Active module adapter dependencies (keep required files)
 /pallavi_code/*
 !/pallavi_code/generator.py
 !/pallavi_code/validator.py
+!/pallavi_code/app.py
+!/pallavi_code/parser.py
+!/pallavi_code/README.md
+!/pallavi_code/requirements.txt
+!/pallavi_code/sample_report.txt
+!/pallavi_code/*.pdf
 
-# Integrated dataset and threat-intel files
+# Integrated threat intelligence store & dataset evidence
 /ishita_code/*
 !/ishita_code/backend/
 !/ishita_code/datasets/
+!/ishita_code/README.md
 /ishita_code/backend/*
+!/ishita_code/backend/app/
 !/ishita_code/backend/data/
+!/ishita_code/backend/.env.example
 /ishita_code/backend/data/*
 !/ishita_code/backend/data/threat_intel_store.json
 /ishita_code/datasets/*
 !/ishita_code/datasets/*.pdf
 !/ishita_code/datasets/*known_exploited*.csv
-
-# Streamlit local state
-.streamlit/secrets.toml
-.aider*

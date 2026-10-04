@@ -14,3 +14,8 @@ reportlab
 pypdf
 pdfplumber
 docutils
+ollama
+python-docx
+python-pptx
+streamlit
+loguru

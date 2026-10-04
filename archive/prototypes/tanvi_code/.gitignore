@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+uploads/
+outputs/
+*.pyc
+.env
+audio/
+video_scenes/
+sample_video.mp4
+video_blueprint_test.json

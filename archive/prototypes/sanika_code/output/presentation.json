@@ -1,0 +1,55 @@
+{
+    "presentation_title": "Overview of Data Roles and Responsibilities",
+    "slides": [
+        {
+            "slide_number": 1,
+            "title": "Data Analyst",
+            "key_points": [
+                "Focuses on analyzing data to generate insights.",
+                "Analyzes trends, creates visualizations, reports findings, and manages databases.",
+                "Mainly works with historical data to inform business decisions."
+            ],
+            "speaker_notes": "Data Analyst is responsible for analyzing data to generate actionable insights and managing databases using tools like SQL, Excel, Tableau, or Power BI. They focus on historical data to inform business decisions."
+        },
+        {
+            "slide_number": 2,
+            "title": "Data Scientist",
+            "key_points": [
+                "Extracts knowledge from structured and unstructured data, building predictive models.",
+                "Handles large datasets with frameworks like Hadoop or Spark and provides forward-looking insights.",
+                "Supports both analytics and operational needs with expertise in machine learning, statistics, and programming languages like Python or R."
+            ],
+            "speaker_notes": "Data Scientist specializes in extracting knowledge from data using machine learning, statistics, and programming languages, handling large datasets with Hadoop or Spark and providing forward-looking insights."
+        },
+        {
+            "slide_number": 3,
+            "title": "Data Engineer",
+            "key_points": [
+                "Designs, builds, and maintains data pipelines and infrastructure.",
+                "Ensures data is collected, stored, and processed efficiently, supporting both analytics and operational needs.",
+                "Supports both analytics and operational needs with expertise in databases, data warehousing, and data management tools like SQL, Excel, Tableau, or Power BI."
+            ],
+            "speaker_notes": "Data Engineer focuses on designing, building, and maintaining data pipelines and infrastructure to ensure efficient data management and processing."
+        },
+        {
+            "slide_number": 4,
+            "title": "Data Manager",
+            "key_points": [
+                "Guides data management teams on data management strategies, long-term data quality improvements, and data-oriented guidance.",
+                "Manages long-term data quality improvements, coordinates data-oriented guidance across the organization.",
+                "Supports data-driven decision-making and innovation with data management."
+            ],
+            "speaker_notes": "Data Manager oversees data management teams, ensures long-term data quality improvements, and coordinates data-oriented guidance across the organization, supporting data-driven decision-making and innovation."
+        },
+        {
+            "slide_number": 5,
+            "title": "Compliance Officer",
+            "key_points": [
+                "Ensures adherence to regulatory and internal policies, including GDPR, HIPAA, or industry-specific standards.",
+                "Maintains data quality, privacy, security, and usability within the organization.",
+                "Supports compliance by ensuring data security, privacy, and usability."
+            ],
+            "speaker_notes": "Compliance Officer ensures adherence to regulatory and internal policies while maintaining data quality, privacy, security, and usability within the organization."
+        }
+    ]
+}
