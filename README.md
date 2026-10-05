@@ -675,4 +675,4 @@ export PYTHONPATH=my_code
 ---
 
 *SIH Problem Statement 26154: NTRO Gen AI Platform for Automated Content Transformation*
-*Usha Mittal Institute of Technology · 2025 to 2026*
+*Usha Mittal Institute of Technology | Team Name: Data Hacklers | Team ID: 131722*
